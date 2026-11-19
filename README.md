@@ -1,73 +1,74 @@
 # Jev Lite
 
-A small local decision API for agents, modeled on the shape of TypeSafe AI's Jev. It answers typed questions about a piece of state with probabilities over options you supply, never free text. It runs on your machine through Ollama.
+A local decision API for agents that follows the architecture in the JEV-as-a-Judge paper: typed decisions with probabilities, a two-order confidence gate, and a cascade that escalates uncertain items to a stronger judge. It runs on your machine through Ollama.
 
-It is not affiliated with TypeSafe AI and it is not Jev. It uses a generic 4B instruct model with no special training, so its probabilities are much less calibrated than Jev's.
+It is not TypeSafe AI's Jev. The paper's hosted model is proprietary, so this build uses local open-weight models in both tiers. The architecture and the evaluation protocol follow the paper. Results will not match the paper's.
 
-## How it works
+## Architecture
 
-Each question takes one model step:
-
-1. Build a prompt: your instructions, the state wrapped in tags, and the options as letters (`A. ...`, `B. ...`), then "Answer with one letter."
-2. Ask Ollama for one output token (`max_tokens: 1`) and the top 20 log-probabilities for that token.
-3. Keep only the option letters, exponentiate their log-probabilities, and renormalize. That gives a probability for every option.
-4. Derive the answer:
-   - **choice**: the most probable option, plus `probabilities` and `confidence = (p_max - 1/n) / (1 - 1/n)`.
-   - **score**: the probability-weighted level number, plus `probabilities`, `legend`, and a confidence from the spread.
-   - **noul**: P(yes), the probability of option A in a yes/no question.
-
-Questions in one request run in parallel threads. The model never writes JSON or prose, so there is nothing to parse or retry.
-
-The confidence formulas follow the ones documented for Jev. This project implements them from that description and has not checked them against Jev's code.
-
-## Endpoints
-
-| Endpoint | Purpose |
-| --- | --- |
-| `POST /api/system-one` | Jev-shaped: `{"state": ..., "questions": {"id": {"type": "choice" \| "score" \| "noul", "instructions": ..., "criteria": ...}}}`. Returns `{"answers": {...}, "latency_ms": ...}`. |
-| `POST /api/task-complexity` | `{"task", "context"?}` returns `{"complexity": "simple"\|"complex", "route": "codex"\|"langgraph"}`. |
-| `POST /api/coding-route` | `{"task", "context"?, "agents"?}` returns `{"agent", "assignment"}` from the five coding roles. |
-
-Criteria:
-
-- choice: an object of option names to descriptions, 2 to 20 options.
-- score: an array of level descriptions, lowest first, 2 to 10 levels.
-- noul: optional `{"true": "...", "false": "..."}`.
-
-Errors: `400` for a bad request, `502` if the model gives no option letter, `503` if Ollama is unreachable or lacks logprobs.
-
-The `assignment` text matches `AGENT_GUIDANCE` in [codex-langgraph](https://github.com/aayushhzz/codex-langgraph), which rejects any other text. Change both together.
-
-Example:
-
-```bash
-curl -s localhost:8876/api/system-one -H 'Content-Type: application/json' -d '{
-  "state": "Rewrites the payment retry logic and changes the database schema.",
-  "questions": {
-    "risk": {"type": "score", "instructions": "How risky is this change?",
-             "criteria": ["trivial", "minor", "moderate", "high", "dangerous"]},
-    "money": {"type": "noul", "instructions": "Does this touch money movement?"}
-  }
-}'
 ```
+          question + two candidate responses (a, b)
+                          |
+        +-----------------v------------------+
+        |  first stage: Jev Lite (4B, local) |   judge (a,b) and (b,a)
+        |  p(a) = 1/2 [p1(a,b) + 1 - p1(b,a)] |   average aligned probabilities (paper eq. 1)
+        |  q    = max(p(a), 1 - p(a))        |   confidence, temperature-scaled
+        +-----------------+------------------+
+                          |
+                q >= tau ?  ----yes---->  accept first-stage verdict
+                          |
+                          no
+                          v
+        +------------------------------------+
+        |  fallback: stronger local model    |   judges (a,b) in base order, alone
+        |  (8B)                               |   its verdict replaces the first stage's
+        +------------------------------------+
+```
+
+- **Primitives** (`POST /api/system-one`): choice, score, noul, and pairwise. Each answer is a probability distribution over options you supply, from one model step.
+- **Two-order gate**: each pair is judged in both presentation orders, and the probabilities are averaged, which cancels position bias. Confidence is q, the largest probability.
+- **Cascade** (`POST /api/cascade`): accepts the first stage when q is at least tau. Otherwise the fallback decides, and it judges only escalated items.
+- **Threshold**: chosen on a selection split with the paper's lower-bound rule (one-sided 95%, margin -0.02, grid 0.5 to 0.99). Ties go to the stricter threshold. If nothing qualifies, everything escalates.
+- **Temperature scaling**: fitted on the selection split by minimizing NLL, as in paper section 7.2. Checked on held-out pairs.
+- **Frozen policy**: `policy.json` holds the temperature and the threshold, and the server loads it at startup.
+
+Jev Lite's other endpoints: `POST /api/task-complexity` and `POST /api/coding-route` (used by [codex-langgraph](https://github.com/aayushhzz/codex-langgraph)). Their response shapes did not change.
 
 ## Run it
 
-Requires Python 3.9 or newer and Ollama. Ollama must support token logprobs, as the 0.40 build here does.
+Requires Python 3.9 or newer, Ollama, and both models:
 
 ```bash
 ollama pull qwen3:4b-instruct
+ollama pull qwen3:8b
 ollama serve            # or: brew services start ollama
-python3 server.py
+python3 server.py       # listens on http://127.0.0.1:8876
 ```
-
-The server listens on `http://127.0.0.1:8876`. Open that page for a small form.
 
 Environment variables:
 
 - `JEV_PORT`: port, default `8876`
-- `JEV_MODEL`: Ollama model, default `qwen3:4b-instruct`
+- `JEV_MODEL`: first-stage model, default `qwen3:4b-instruct`
+- `JEV_FALLBACK_MODEL`: fallback model, default `qwen3:8b`
 - `OLLAMA_URL`: loopback Ollama URL, default `http://127.0.0.1:11434`
+
+Examples:
+
+```bash
+# Cascade: needs policy.json (run the evaluation below first)
+curl -s localhost:8876/api/cascade -H 'Content-Type: application/json' -d '{
+  "state": "Which city is the capital of Australia?",
+  "instructions": "Which response correctly and fully answers the question?",
+  "a": "Canberra", "b": "Sydney"
+}'
+
+# Primitives: choice, score, noul, pairwise
+curl -s localhost:8876/api/system-one -H 'Content-Type: application/json' -d '{
+  "state": "Rewrites the payment retry logic and changes the database schema.",
+  "questions": {"risk": {"type": "score", "instructions": "How risky is this change?",
+                         "criteria": ["trivial", "minor", "moderate", "high", "dangerous"]}}
+}'
+```
 
 Tests (no Ollama needed):
 
@@ -75,30 +76,84 @@ Tests (no Ollama needed):
 python3 -m unittest discover -s tests
 ```
 
-Benchmark (needs the running server and Ollama):
+Evaluation (needs both models, roughly 10 minutes):
 
 ```bash
-python3 bench/run_bench.py
+python3 bench/cascade_eval.py     # writes policy.json and bench/results/
 ```
 
-## Measured results
+## Evaluation protocol
 
-Hardware: Apple M2 Pro, 16 GB, Ollama 0.40.16, `qwen3:4b-instruct`.
+The harness follows the paper's order of operations:
 
-| Check | Result |
+1. Judge the selection pairs with both tiers. Apply the temperature and threshold rules to them.
+2. Freeze the temperature and threshold in `policy.json`. Nothing is tuned after this.
+3. Judge the held-out pairs offline, and run the frozen cascade live through the server's own method.
+4. Report accuracy, escalation rate, paired difference against the fallback with a 2,000-resample bootstrap, ECE over 10 bins, Brier, NLL, error AUROC of 1 - q, and selective accuracy at 80% and 50% coverage.
+
+The labels are 75 selection pairs and 77 held-out pairs, written by hand in [`bench/pairs.py`](bench/pairs.py). Each correct answer was fixed when its pair was written, and the position of the correct answer is randomized. The set is small and was written by one person, so the results are a sanity check, not a benchmark.
+
+## Results
+
+Hardware: Apple M2 Pro, 16 GB, Ollama 0.40.16. First stage `qwen3:4b-instruct` (two orders). Fallback `qwen3:8b`, one order, thinking disabled (see Limits). Raw outputs are in [`bench/results/`](bench/results/).
+
+**Selection split (75 pairs, used to fit T and tau)**
+
+| | First stage | Fallback |
+| --- | --- | --- |
+| Accuracy (ties at half credit) | 96.0% | 90.7% |
+
+The temperature fit picked T = 4.0. Selection NLL fell from 0.245 to 0.098. The lower-bound rule picked tau = 0.5. Because every confidence is at least 0.5, that setting escalates nothing. This is the paper's documented case: the first stage matches or beats the fallback on the selection split, so the rule accepts everything.
+
+**Held-out split (77 pairs, scored once)**
+
+| Metric | Value |
 | --- | --- |
-| Offline tests | 25 pass (stub model) |
-| Support-ticket benchmark, 40 hand-labeled tickets, 4 categories | accuracy 92.5% (37/40), Brier 0.150, ECE 0.073 (10 bins, top probability) |
-| Latency, one choice question, warm | p50 182 ms, p95 186 ms |
-| Latency, four questions in one request | p50 244 ms, p95 249 ms |
-| Prompt injection in state (one sample, choice) | resisted: returned `no` |
+| First stage alone | 93.5% (72/77) |
+| Fallback alone | 96.1% (74/77) |
+| Frozen cascade, live | 93.5%, escalated 0% |
+| Cascade minus fallback | -2.6 points, 95% bootstrap interval [-9.1, +3.9] |
+| Live decisions agreeing with offline simulation | 100% |
+| ECE, 10 bins (T = 1 to T = 4) | 0.046 to 0.042 |
+| Brier (T = 1 to T = 4) | 0.072 to 0.067 |
+| NLL (T = 1 to T = 4) | 0.178 to 0.097 |
+| Error AUROC of 1 - q | 0.98 (5 first-stage errors, so very noisy) |
+| Latency, p50: first-stage path / fallback alone | 213 ms / 232 ms |
 
-The 40 labels were written before any model run. The sample is small, so treat these numbers as a sanity check, not a benchmark.
+Temperature scaling improved held-out NLL here. The paper found it helped one dataset and hurt two.
+
+**Post hoc threshold sweep (not used for the policy)**
+
+These numbers score thresholds on the held-out set, so they are for reading only. Choosing tau from them would fit the test set.
+
+| tau | Escalated | Cascade minus fallback |
+| --- | --- | --- |
+| 0.5 (frozen) | 0% | -2.6 points |
+| 0.7 | 3.9% | 0.0 |
+| 0.8 | 5.2% | 0.0 |
+| 0.9 | 13.0% | +1.3 |
+| 0.99 | 14.3% | +1.3 |
+
+**Live escalation check.** A second server with tau = 0.99 escalated one pair: the eraser problem, where the wrong answer was offered first. Both stages picked the wrong answer, so the escalated path runs correctly but did not help on that item. Total latency for the escalated path was 639 ms.
+
+**What this shows.** The architecture runs end to end: the two-order gate, temperature scaling, a frozen threshold, the cascade endpoint, and live escalation. The frozen threshold did not transfer. The selection split is small (75 pairs), and the fallback ran with thinking disabled, so it is not the stronger judge the paper assumes.
 
 ## Limits
 
-- **Calibration.** An ECE of 0.073 means the top probability is off from observed accuracy by about 7 points on average in this set. The bins were not split by direction, so this does not show whether it is over- or under-confident. A calibration step, such as fitting a temperature on held-out labels, is not implemented yet.
-- **Injection.** Option letters block the old JSON-based failure, but one sample proves little. Treat state as untrusted.
-- **Not Jev.** Jev is a hosted model trained with a method the company has not published. This build uses a generic model and makes no claim to Jev's accuracy or latency at scale.
+- **Not Jev.** The paper's hosted model was trained with a method that is not published. This build uses generic local models, so the gap to the paper's accuracy and calibration is expected.
+- **Small, hand-labeled set.** The paper evaluates on 1,850 preference pairs and more. Threshold fits on 75 pairs are noisy, and the lower-bound rule tends to escalate more when labels are few.
+- **Temperature transfers unevenly.** The paper reports this too (section 7.2). The fit here may help or hurt on held-out pairs.
+- **Serial cascade only.** The paper's fusion and debate variants are not built.
+- **The fallback is not the stronger judge here.** Qwen3's thinking mode would make the 8B model stronger, but a one-token logprob read cannot use it, so `reasoning_effort: "none"` turns thinking off. On the selection split the 4B first stage beat it (96% against 91%). The paper's fallback is a reasoning model.
+- **Temperature also changes the routing confidences.** `/api/coding-route` and `/api/task-complexity` use the same first-stage model, so with `policy.json` they report temperature-scaled confidence. Temperature is monotone, so the chosen role does not change.
+- **Escalation rule.** `JEV_POLICY` lets you point at another policy file for tests. The policy is only as good as its selection split.
 - **No auth.** It binds to loopback. Do not expose it.
-- **Stateless.** Each request is independent. Nothing is stored.
+- **Stateless.** Nothing is stored between requests.
+
+## Sources
+
+- Li, Y., Miao, Y., Krishnan, R., and Padman, R. *JEV-as-a-Judge: Accept When Confident, Escalate When Unsure.* arXiv:2609.26550 (v6, 29 Oct 2026). https://arxiv.org/abs/2609.26550
+- Deußer, T., Ramamurthy, R., Sparrenberg, L., and Sifa, R. *Evaluating and Benchmarking the System One Model Jev.* arXiv:2609.37647 (v2, 29 Oct 2026). https://arxiv.org/abs/2609.37647
+- TypeSafe AI, Jev documentation. https://docs.typesafe.ai/introduction
+- TypeSafe AI, *Introducing System One models and Jev.* https://typesafe.ai/blog/introducing-system-one-models-and-jev
+- Guo, C., Pleiss, G., Sun, Y., and Weinberger, K. Q. *On Calibration of Modern Neural Networks.* ICML 2017. Cited by both papers for temperature scaling and the confidence definition; not read directly here.

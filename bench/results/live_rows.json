@@ -1,0 +1,618 @@
+[
+  {
+    "id": "test-075",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 218.8,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-076",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 137.6,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-077",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 137.7,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-078",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 137.1,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-079",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 214.7,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-080",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 214.4,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-081",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 213.4,
+    "cascade": 0.0
+  },
+  {
+    "id": "test-082",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 211.7,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-083",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 235.6,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-084",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 217.3,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-085",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 213.3,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-086",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 214.8,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-087",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 221.3,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-088",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 169.0,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-089",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 185.1,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-090",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 169.8,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-091",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 211.2,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-092",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 211.7,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-093",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 215.3,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-094",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 138.6,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-095",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 138.2,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-096",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 213.4,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-097",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 214.9,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-098",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 222.8,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-099",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 169.0,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-100",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 210.3,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-101",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 182.6,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-102",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 210.9,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-103",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 213.2,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-104",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 138.4,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-105",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 209.8,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-106",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 216.8,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-107",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 219.6,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-108",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 183.4,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-109",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 212.9,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-110",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 213.1,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-111",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 214.0,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-112",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 137.6,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-113",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 210.3,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-114",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 210.6,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-115",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 211.8,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-116",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 137.4,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-117",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 214.9,
+    "cascade": 0.0
+  },
+  {
+    "id": "test-118",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 184.9,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-119",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 209.9,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-120",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 214.4,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-121",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 167.5,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-122",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 215.0,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-123",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 214.1,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-124",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 210.2,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-125",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 138.5,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-126",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 185.2,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-127",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 138.7,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-128",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 213.9,
+    "cascade": 0.0
+  },
+  {
+    "id": "test-129",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 214.9,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-130",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 217.0,
+    "cascade": 0.0
+  },
+  {
+    "id": "test-131",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 215.2,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-132",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 214.0,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-133",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 138.8,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-134",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 137.9,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-135",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 182.9,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-136",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 216.8,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-137",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 215.2,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-138",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 209.9,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-139",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 212.8,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-140",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 212.8,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-141",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 213.6,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-142",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 217.0,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-143",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 218.6,
+    "cascade": 0.0
+  },
+  {
+    "id": "test-144",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 182.4,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-145",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 217.7,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-146",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 218.2,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-147",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 184.5,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-148",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 211.4,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-149",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 217.4,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-150",
+    "decision": "a",
+    "path": "first_stage",
+    "truth": "a",
+    "ms": 218.1,
+    "cascade": 1.0
+  },
+  {
+    "id": "test-151",
+    "decision": "b",
+    "path": "first_stage",
+    "truth": "b",
+    "ms": 145.5,
+    "cascade": 1.0
+  }
+]

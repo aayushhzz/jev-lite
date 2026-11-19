@@ -1,0 +1,21 @@
+{
+  "tau": 0.5,
+  "temperature": 4.0,
+  "rule": "lower_bound",
+  "margin": -0.02,
+  "grid": [
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+  ],
+  "first_stage_model": "qwen3:4b-instruct",
+  "fallback_model": "qwen3:8b",
+  "selection_pairs": 75,
+  "selection_nll_at_T1": 0.2449,
+  "selection_nll_at_T": 0.0983,
+  "point_rule_tau_for_comparison": 0.5
+}

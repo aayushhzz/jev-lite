@@ -51,6 +51,7 @@ MAX_OPTIONS = 20  # also the top-logprob budget per step
 MAX_LEVELS = 10
 MAX_QUESTIONS = 20
 MAX_TEXT_CHARS = 32000
+MAX_CANDIDATE_CHARS = 2000  # a pairwise response is listed as an option line, so keep it short
 MAX_BODY_BYTES = 256 * 1024
 DEFAULT_PORT = 8876
 PARALLEL_WORKERS = 8
@@ -110,6 +111,7 @@ class OllamaStepModel:
             "model": self.model,
             "temperature": 0,
             "max_tokens": 1,  # a single decode step: no free text
+            "reasoning_effort": "none",  # Qwen3 thinking models otherwise spend that one token on a think block
             "logprobs": True,
             "top_logprobs": MAX_OPTIONS,
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
@@ -133,6 +135,15 @@ class OllamaStepModel:
             raise ModelUnavailable(f"Ollama call failed at {self.url}: {exc}") from exc
 
 
+def sharpen(probs: Dict[str, float], temperature: float) -> Dict[str, float]:
+    """Temperature scaling (Guo et al. 2017): p_i is proportional to p_i ** (1 / T). T=1 leaves probs unchanged."""
+    if temperature == 1.0:
+        return probs
+    powered = {label: value ** (1.0 / temperature) for label, value in probs.items()}
+    total = sum(powered.values())
+    return {label: value / total for label, value in powered.items()}
+
+
 def fenced(label: str, text: str) -> str:
     """Wrap untrusted text so it cannot close its own block early."""
     closing = "</" + label + ">"
@@ -144,10 +155,18 @@ def clamp01(value: float) -> float:
 
 
 class JevLite:
-    """Jev-shaped primitives: choice, score, and noul, each answered in one step."""
+    """Jev-shaped primitives (choice, score, noul, pairwise) and the escalation cascade.
 
-    def __init__(self, model: Any) -> None:
+    `fallback` is the stronger judge that decides escalated items. `policy` is the frozen
+    threshold, {"tau": float or None}; None means no policy has been fitted yet.
+    """
+
+    def __init__(self, model: Any, fallback: Optional["JevLite"] = None, policy: Optional[Dict[str, Any]] = None,
+                 temperature: float = 1.0) -> None:
         self.model = model
+        self.fallback = fallback
+        self.policy = policy
+        self.temperature = temperature  # fitted on the selection pairs; 1.0 means uncalibrated
 
     def _step(self, state: str, instructions: str, options: List[Tuple[str, str]]) -> Dict[str, float]:
         labels = [label for label, _ in options]
@@ -156,7 +175,7 @@ class JevLite:
         probs = self.model.label_probs(SYSTEM_PROMPT, user, labels)
         if not probs or sum(probs.values()) <= 0:
             raise InvalidAnswer("model gave no probability for any option")
-        return probs
+        return sharpen(probs, self.temperature)
 
     def choice(self, state: str, instructions: str, criteria: Dict[str, str]) -> Dict[str, Any]:
         names = list(criteria)
@@ -216,7 +235,43 @@ class JevLite:
             if criteria is not None and not isinstance(criteria, dict):
                 raise BadRequest("noul criteria must be an object with true and false texts")
             return self.noul(state, instructions, criteria)
-        raise BadRequest("type must be choice, score, or noul")
+        if kind == "pairwise":
+            a, b = pair_candidates(criteria)
+            return self.judge_pair(state, instructions, a, b)
+        raise BadRequest("type must be choice, score, noul, or pairwise")
+
+    def judge_pair(self, state: str, instructions: str, a: str, b: str) -> Dict[str, Any]:
+        """Two-order gate from JEV-as-a-Judge (eq. 1): average P(a wins) over both presentation orders."""
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            ab = pool.submit(self._step, state, instructions, [("A", a), ("B", b)])
+            ba = pool.submit(self._step, state, instructions, [("A", b), ("B", a)])
+            p_ab, p_ba = ab.result()["A"], ba.result()["A"]
+        p_a = 0.5 * (p_ab + (1 - p_ba))  # in order (b, a), 1 - P(first) is P(a wins)
+        choice = "a" if p_a > 0.5 else ("b" if p_a < 0.5 else "tie")
+        return {
+            "type": "pairwise",
+            "choice": choice,
+            "p_a": p_a,
+            "confidence_q": max(p_a, 1 - p_a),  # q = max probability, as the paper defines confidence
+            "orders": {"a_first": p_ab, "b_first": p_ba},
+        }
+
+    def judge_base(self, state: str, instructions: str, a: str, b: str) -> Dict[str, Any]:
+        """One judgment in the presented order, as the paper's fallback judge is run."""
+        p_a = self._step(state, instructions, [("A", a), ("B", b)])["A"]
+        return {"type": "pairwise", "choice": "a" if p_a >= 0.5 else "b", "p_a": p_a}
+
+    def cascade(self, state: str, instructions: str, a: str, b: str) -> Dict[str, Any]:
+        """Accept the two-order verdict when q >= tau; otherwise the fallback judge decides."""
+        tau = self.policy["tau"]
+        try:
+            first = self.judge_pair(state, instructions, a, b)
+        except InvalidAnswer:
+            first = None  # invalid first-stage output always escalates
+        if first and first["choice"] != "tie" and tau is not None and first["confidence_q"] >= tau:
+            return {"path": "first_stage", "decision": first["choice"], "first_stage": first, "fallback": None}
+        second = self.fallback.judge_base(state, instructions, a, b)
+        return {"path": "escalated", "decision": second["choice"], "first_stage": first, "fallback": second}
 
     def answer(self, state: str, questions: Dict[str, Any]) -> Dict[str, Any]:
         """Answer independent questions about one state, in parallel."""
@@ -243,6 +298,33 @@ def state_value(value: Any) -> str:
     if isinstance(value, (dict, list)):
         value = json.dumps(value, sort_keys=True)
     return text_value(value, "state")
+
+
+def pair_candidates(criteria: Any) -> Tuple[str, str]:
+    """The two responses being compared. Each is flattened to one line, since it is listed as an option."""
+    if not isinstance(criteria, dict):
+        raise BadRequest("pairwise criteria must be an object with a and b texts")
+    values = []
+    for key in ("a", "b"):
+        value = criteria.get(key)
+        if not isinstance(value, str) or not value.strip():
+            raise BadRequest(f"pairwise needs a non-empty '{key}' text")
+        if len(value) > MAX_CANDIDATE_CHARS:
+            raise BadRequest(f"pairwise '{key}' exceeds {MAX_CANDIDATE_CHARS} characters")
+        values.append(" ".join(value.split()))
+    return values[0], values[1]
+
+
+def route_cascade(svc: JevLite, body: Dict[str, Any]) -> Dict[str, Any]:
+    if svc.fallback is None or svc.policy is None:
+        raise ModelUnavailable("cascade not configured: needs a fallback model and a frozen policy.json (run bench/cascade_eval.py)")
+    instructions = text_value(body.get("instructions"), "instructions")
+    a, b = pair_candidates({"a": body.get("a"), "b": body.get("b")})
+    state = state_value(body.get("state", ""))
+    started = time.perf_counter()
+    result = svc.cascade(state, instructions, a, b)
+    result["latency_ms"] = round((time.perf_counter() - started) * 1000, 1)
+    return result
 
 
 def route_system_one(svc: JevLite, body: Dict[str, Any]) -> Dict[str, Any]:
@@ -277,6 +359,7 @@ def route_coding(svc: JevLite, body: Dict[str, Any]) -> Dict[str, Any]:
 
 POST_ROUTES = {
     "/api/system-one": route_system_one,
+    "/api/cascade": route_cascade,
     "/api/task-complexity": route_task_complexity,
     "/api/coding-route": route_coding,
 }
@@ -398,15 +481,34 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
 
+def load_policy(path: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    """The threshold frozen by bench/cascade_eval.py. Missing or malformed means not configured."""
+    path = path or os.environ.get("JEV_POLICY") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "policy.json")
+    if not os.path.exists(path):
+        return None
+    with open(path) as handle:
+        policy = json.load(handle)
+    tau = policy.get("tau")
+    if tau is not None and not (isinstance(tau, (int, float)) and 0.5 <= tau <= 1.0):
+        raise ValueError("policy.json tau must be null or a number from 0.5 to 1.0")
+    return policy
+
+
 def main() -> None:
     host, port = "127.0.0.1", int(os.environ.get("JEV_PORT", DEFAULT_PORT))
-    model = OllamaStepModel()
-    try:
-        model.warm()
-    except ModelUnavailable as exc:
-        print(f"warning: {exc}; answers will fail until Ollama is running")
+    first = OllamaStepModel()
+    fallback = OllamaStepModel(model=os.environ.get("JEV_FALLBACK_MODEL", "qwen3:8b"))
+    for name, model in (("first stage", first), ("fallback", fallback)):
+        try:
+            model.warm()
+        except ModelUnavailable as exc:
+            print(f"warning: {name} model not warm: {exc}")
+    policy = load_policy()
+    if policy is None:
+        print("warning: no policy.json; /api/cascade will answer 503 until bench/cascade_eval.py writes one")
+    temperature = float(policy.get("temperature") or 1.0) if policy else 1.0
     httpd = ThreadingHTTPServer((host, port), Handler)
-    httpd.jev = JevLite(model)  # type: ignore[attr-defined]
+    httpd.jev = JevLite(first, fallback=JevLite(fallback), policy=policy, temperature=temperature)  # type: ignore[attr-defined]
     print(f"Jev Lite listening on http://{host}:{port}")
     httpd.serve_forever()
 
