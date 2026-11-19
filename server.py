@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 import string
 import time
 import urllib.request
@@ -98,6 +99,19 @@ def top_label_probs(data: Dict[str, Any], labels: Sequence[str]) -> Dict[str, fl
     return {label: mass.get(label, 0.0) / total for label in labels}
 
 
+def _post_json(url: str, path: str, payload: Dict[str, Any], timeout: float) -> Dict[str, Any]:
+    request = urllib.request.Request(
+        url + path,
+        data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return json.load(response)
+    except (OSError, ValueError) as exc:
+        raise ModelUnavailable(f"Ollama call failed at {url}: {exc}") from exc
+
+
 class OllamaStepModel:
     """One Ollama step per question: returns the probability of each option letter."""
 
@@ -123,16 +137,7 @@ class OllamaStepModel:
         self._post("/api/generate", {"model": self.model, "keep_alive": "30m"})
 
     def _post(self, path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        request = urllib.request.Request(
-            self.url + path,
-            data=json.dumps(payload).encode(),
-            headers={"Content-Type": "application/json"},
-        )
-        try:
-            with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                return json.load(response)
-        except (OSError, ValueError) as exc:
-            raise ModelUnavailable(f"Ollama call failed at {self.url}: {exc}") from exc
+        return _post_json(self.url, path, payload, self.timeout)
 
 
 def sharpen(probs: Dict[str, float], temperature: float) -> Dict[str, float]:
@@ -142,6 +147,41 @@ def sharpen(probs: Dict[str, float], temperature: float) -> Dict[str, float]:
     powered = {label: value ** (1.0 / temperature) for label, value in probs.items()}
     total = sum(powered.values())
     return {label: value / total for label, value in powered.items()}
+
+
+THINK_BUDGET_TOKENS = 4096  # thinking plus answer; a verdict that runs out of budget counts as invalid
+
+
+def parse_verdict(content: str, labels: Sequence[str]) -> Optional[str]:
+    """The last standalone option letter in the final answer, so '**B**' and 'The answer is B.' both work."""
+    found = [m for m in re.findall(r"(?<![A-Za-z])([A-Z])(?![A-Za-z])", content) if m in labels]
+    return found[-1] if found else None
+
+
+class OllamaVerdictModel:
+    """A thinking model that returns a verdict letter, for the fallback judge. No probabilities."""
+
+    def __init__(self, url: Optional[str] = None, model: Optional[str] = None, timeout: float = 600.0) -> None:
+        self.url = require_loopback(url or os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434"))
+        self.model = model or os.environ.get("JEV_FALLBACK_MODEL", "qwen3:8b")
+        self.timeout = timeout
+
+    def verdict(self, system: str, user: str, labels: Sequence[str]) -> str:
+        payload = {
+            "model": self.model,
+            "stream": False,
+            "think": True,  # the reasoning model's own thinking, as the paper's fallback uses
+            "options": {"temperature": 0, "num_predict": THINK_BUDGET_TOKENS},
+            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+        }
+        data = _post_json(self.url, "/api/chat", payload, self.timeout)
+        letter = parse_verdict(data.get("message", {}).get("content", ""), labels)
+        if letter is None:
+            raise InvalidAnswer(f"no option letter in the final answer (done_reason={data.get('done_reason')})")
+        return letter
+
+    def warm(self) -> None:
+        _post_json(self.url, "/api/generate", {"model": self.model, "keep_alive": "30m"}, self.timeout)
 
 
 def fenced(label: str, text: str) -> str:
@@ -168,10 +208,14 @@ class JevLite:
         self.policy = policy
         self.temperature = temperature  # fitted on the selection pairs; 1.0 means uncalibrated
 
-    def _step(self, state: str, instructions: str, options: List[Tuple[str, str]]) -> Dict[str, float]:
+    @staticmethod
+    def _prompt(state: str, instructions: str, options: List[Tuple[str, str]]) -> Tuple[List[str], str]:
         labels = [label for label, _ in options]
         listing = "\n".join(f"{label}. {text}" for label, text in options)
-        user = f"{instructions}\n{fenced('state', state)}\nOptions:\n{listing}\nAnswer with one letter."
+        return labels, f"{instructions}\n{fenced('state', state)}\nOptions:\n{listing}\nAnswer with one letter."
+
+    def _step(self, state: str, instructions: str, options: List[Tuple[str, str]]) -> Dict[str, float]:
+        labels, user = self._prompt(state, instructions, options)
         probs = self.model.label_probs(SYSTEM_PROMPT, user, labels)
         if not probs or sum(probs.values()) <= 0:
             raise InvalidAnswer("model gave no probability for any option")
@@ -257,7 +301,15 @@ class JevLite:
         }
 
     def judge_base(self, state: str, instructions: str, a: str, b: str) -> Dict[str, Any]:
-        """One judgment in the presented order, as the paper's fallback judge is run."""
+        """One judgment in the presented order, as the paper's fallback judge is run.
+
+        A model with `verdict` (the thinking fallback) returns its letter only, so no probability is
+        reported. Otherwise the step model's probability decides, as in the first stage.
+        """
+        if hasattr(self.model, "verdict"):
+            labels, user = self._prompt(state, instructions, [("A", a), ("B", b)])
+            letter = self.model.verdict(SYSTEM_PROMPT, user, labels)
+            return {"type": "pairwise", "choice": "a" if letter == "A" else "b", "verdict_only": True}
         p_a = self._step(state, instructions, [("A", a), ("B", b)])["A"]
         return {"type": "pairwise", "choice": "a" if p_a >= 0.5 else "b", "p_a": p_a}
 
@@ -497,7 +549,7 @@ def load_policy(path: Optional[str] = None) -> Optional[Dict[str, Any]]:
 def main() -> None:
     host, port = "127.0.0.1", int(os.environ.get("JEV_PORT", DEFAULT_PORT))
     first = OllamaStepModel()
-    fallback = OllamaStepModel(model=os.environ.get("JEV_FALLBACK_MODEL", "qwen3:8b"))
+    fallback = OllamaVerdictModel(model=os.environ.get("JEV_FALLBACK_MODEL", "qwen3:8b"))
     for name, model in (("first stage", first), ("fallback", fallback)):
         try:
             model.warm()

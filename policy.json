@@ -1,5 +1,5 @@
 {
-  "tau": 0.5,
+  "tau": 0.99,
   "temperature": 4.0,
   "rule": "lower_bound",
   "margin": -0.02,
@@ -17,5 +17,5 @@
   "selection_pairs": 100,
   "selection_nll_at_T1": 0.2114,
   "selection_nll_at_T": 0.1048,
-  "point_rule_tau_for_comparison": 0.5
+  "point_rule_tau_for_comparison": 0.7
 }

@@ -245,7 +245,7 @@ def main() -> None:
     test = [i for i in items if i["split"] == "heldout"]  # fresh: scored once, after the policy is frozen
     legacy = [i for i in items if i["split"] == "legacy"]  # previously inspected: a sanity check only
     first = server.JevLite(server.OllamaStepModel(model=FIRST))  # temperature 1.0 on purpose: raw orders
-    fallback = server.JevLite(server.OllamaStepModel(model=FALLBACK))
+    fallback = server.JevLite(server.OllamaVerdictModel(model=FALLBACK))
     print(f"select: {len(select)}, heldout (fresh): {len(test)}, legacy: {len(legacy)}; first={FIRST} fallback={FALLBACK}")
 
     # 1-2. Selection set: raw judgments, then a temperature.
@@ -278,7 +278,7 @@ def main() -> None:
     offline_uncal = summarize(test_t1, simulate(test_t1, tau_uncal))
     offline_cal = summarize(test_T, simulate(test_T, tau_cal))
 
-    live = server.JevLite(server.OllamaStepModel(model=FIRST), fallback=server.JevLite(server.OllamaStepModel(model=FALLBACK)),
+    live = server.JevLite(server.OllamaStepModel(model=FIRST), fallback=server.JevLite(server.OllamaVerdictModel(model=FALLBACK)),
                           policy=policy, temperature=T)
     live_rows = run_live(live, test)
     sim_rows = simulate(test_T, tau_cal)
