@@ -35,6 +35,7 @@ sys.path.insert(0, str(ROOT / "bench"))
 import server  # noqa: E402
 from pairs import PAIRS  # noqa: E402  (legacy held-out and the first 75 selection pairs)
 from pairs_extra import EXTRA_SELECT, HELDOUT  # noqa: E402
+from pairs_hard import HARD_SELECT, HARD_HELDOUT  # noqa: E402
 
 FIRST = os.environ.get("JEV_MODEL", "qwen3:4b-instruct")
 FALLBACK = os.environ.get("JEV_FALLBACK_MODEL", "qwen3:8b")
@@ -240,9 +241,9 @@ def run_live(live: server.JevLite, items: List[Dict[str, Any]]) -> List[Dict[str
 
 def main() -> None:
     RESULTS.mkdir(parents=True, exist_ok=True)
-    items = orient(PAIRS + EXTRA_SELECT + HELDOUT)
-    select = [i for i in items if i["split"] == "select"]
-    test = [i for i in items if i["split"] == "heldout"]  # fresh: scored once, after the policy is frozen
+    items = orient(PAIRS + EXTRA_SELECT + HELDOUT + HARD_SELECT + HARD_HELDOUT)
+    select = [i for i in items if i["split"] in ("select", "hard_select")]
+    test = [i for i in items if i["split"] in ("heldout", "hard_heldout")]  # fresh: scored once, after the policy is frozen
     legacy = [i for i in items if i["split"] == "legacy"]  # previously inspected: a sanity check only
     first = server.JevLite(server.OllamaStepModel(model=FIRST))  # temperature 1.0 on purpose: raw orders
     fallback = server.JevLite(server.OllamaVerdictModel(model=FALLBACK))
@@ -310,9 +311,17 @@ def main() -> None:
                       "escalated_pct": round(100 * sum(1 for r in rows if not r["accepted"]) / len(rows), 1),
                       "cascade_minus_fallback_pp": round(100 * statistics.mean(r["cascade"] - r["fallback"] for r in rows), 2)})
 
+    rows_cal = simulate(test_T, tau_cal)
+    easy_idx = [i for i, it in enumerate(test) if it["split"] == "heldout"]
+    hard_idx = [i for i, it in enumerate(test) if it["split"] == "hard_heldout"]
+    def subgroup(idx):
+        return summarize([test_T[i] for i in idx], [rows_cal[i] for i in idx])
+    subgroups = {"easy_heldout_calibrated": subgroup(easy_idx), "hard_heldout_calibrated": subgroup(hard_idx)}
+
     report = {
         "policy": policy,
         "selection_counts": {"select": len(select), "heldout_fresh": len(test), "legacy_previously_inspected": len(legacy)},
+        "heldout_subgroups_calibrated": subgroups,
         "heldout_fresh_offline_uncalibrated_T1": offline_uncal,
         "heldout_fresh_offline_calibrated": offline_cal,
         "heldout_fresh_live_frozen_cascade": live_summary,

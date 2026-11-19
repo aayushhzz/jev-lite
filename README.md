@@ -91,37 +91,38 @@ The harness follows the paper's order of operations:
 3. Judge the held-out pairs offline, and run the frozen cascade live through the server's own method.
 4. Report accuracy, escalation rate, paired difference against the fallback with a 2,000-resample bootstrap, ECE over 10 bins, Brier, NLL, error AUROC of 1 - q, and selective accuracy at 80% and 50% coverage.
 
-The labels are 100 selection pairs, 98 fresh held-out pairs, and 77 legacy pairs. They are hand-written in [`bench/pairs.py`](bench/pairs.py) and [`bench/pairs_extra.py`](bench/pairs_extra.py). Each correct answer was fixed when its pair was written, and the position of the correct answer is randomized. The sets are small and written by one person, so the results are a sanity check, not a benchmark.
+The labels are 150 selection pairs, 146 fresh held-out pairs, and 77 legacy pairs. They are hand-written in [`bench/pairs.py`](bench/pairs.py), [`bench/pairs_extra.py`](bench/pairs_extra.py), and [`bench/pairs_hard.py`](bench/pairs_hard.py). The hard pairs need multi-step counting, probability, Python and SQL semantics, graph theory, or obscure facts. Each correct answer was fixed when its pair was written, and the position of the correct answer is randomized. The sets are small and written by one person, so the results are a sanity check, not a benchmark.
 
 ## Results
 
-Hardware: Apple M2 Pro, 16 GB, Ollama 0.40.16. First stage `qwen3:4b-instruct`, two orders, read from logprobs. Fallback `qwen3:8b` with thinking enabled, one order, read as a verdict letter from the final answer. Raw judgments and full metrics are in [`bench/results/`](bench/results/).
+Hardware: Apple M2 Pro, 16 GB, Ollama 0.40.16. First stage `qwen3:4b-instruct`, two orders, read from logprobs. Fallback `qwen3:8b` with thinking enabled, one order, read as a verdict letter. Raw judgments and full metrics are in [`bench/results/`](bench/results/).
 
-Three sets: 100 selection pairs (fit T and tau), 98 fresh held-out pairs (scored once, after the policy was frozen), and 77 legacy pairs that I had already inspected (sanity only).
+Three sets: 150 selection pairs (100 easy, 50 hard; fit T and tau), 146 fresh held-out pairs (98 easy, 48 hard; scored once after freezing), and 77 legacy pairs that I had already inspected (sanity only).
 
-**Selection (100 pairs)**
+**Selection (150 pairs)**
 
 | | First stage | Fallback (thinking) |
 | --- | --- | --- |
-| Accuracy (ties at half credit) | 96% | 100% |
+| All 150 | 90.0% | 100% |
+| Easy (100) | 96.0% | 100% |
+| Hard (50) | 78.0% | 100% |
 
-The temperature fit picked T = 4.0, and selection NLL fell from 0.211 to 0.105. The lower-bound rule picked tau = 0.99. With no temperature (T = 1) no threshold qualified, so every item would escalate.
+The temperature fit picked T = 6.0, and selection NLL fell from 0.512 to 0.207. The lower-bound rule picked tau = 0.95. With no temperature (T = 1) no threshold qualified, so every item would escalate.
 
-**Fresh held-out (98 pairs)**
+**Fresh held-out (146 pairs)**
 
 | Metric | Value |
 | --- | --- |
-| First stage alone | 94.9% (93/98) |
-| Fallback alone, thinking | 100% (98/98) |
-| Frozen cascade, live | 100%, escalated 29.6% |
-| Cascade minus fallback | 0.0 points (both 100%) |
-| First-stage errors that were escalated | 5 of 5 |
+| First stage alone | 92.5% (135/146) |
+| Fallback alone, thinking | 100% (146/146) |
+| Frozen cascade, live | 100%, escalated 32.2% (47/146) |
+| Cascade minus fallback | 0.0 points |
+| First-stage errors that were escalated | all of them |
+| Escalated, easy / hard | 24.5% / 47.9% |
+| First stage, easy / hard | 94.9% / 87.5% |
 | Live decisions agreeing with offline simulation | 100% |
-| ECE, 10 bins (T = 1 to T = 4) | 0.056 to 0.027 |
-| Error AUROC of 1 - q | 0.91 |
-| Latency, p50: accepted path / escalated path / fallback alone | 218 ms / 9,221 ms / 6,425 ms |
-
-The cascade matches the fallback's accuracy and sends 70% of items to the cheap first stage. The first stage misses on five items, and the gate escalates all five.
+| ECE, 10 bins (T = 1 to T = 6, calibrated subsets above) | 0.051 to 0.018 |
+| Latency, p50: accepted path / escalated path / fallback alone | 215 ms / 10,789 ms / 7,199 ms |
 
 **Legacy set (77 pairs, previously inspected)**: cascade 100%, escalated 14.3%. The first stage gets 93.5% and the fallback 100%.
 
@@ -131,23 +132,15 @@ These numbers score thresholds on the held-out set, so they are for reading only
 
 | tau | Escalated | Cascade minus fallback |
 | --- | --- | --- |
-| 0.5 | 0% | -5.1 |
-| 0.6 | 4.1% | -4.1 |
-| 0.7 | 7.1% | -3.1 |
-| 0.8 | 8.2% | -3.1 |
-| 0.9 | 12.2% | -2.0 |
-| 0.95 | 19.4% | -1.0 |
-| 0.99 (frozen) | 29.6% | 0.0 |
+| 0.5 | 0% | -7.5 |
+| 0.6 | 7.5% | -4.1 |
+| 0.7 | 12.3% | -2.7 |
+| 0.8 | 15.1% | -2.1 |
+| 0.9 | 24.0% | -0.7 |
+| 0.95 (frozen) | 32.2% | 0.0 |
+| 0.99 | 100% | 0.0 |
 
-Lower thresholds let first-stage errors through, and the sweep shows the cost.
-
-**What changed from the run without thinking.** Before this change (commit `03d8833`), the fallback was weaker than the first stage, so the gate escalated nothing. With thinking on, the fallback is correct on every labeled pair, so the rule now escalates the items the first stage isn't sure about.
-
-**Caveats**
-
-- **Ceiling.** The fallback gets all 275 labeled pairs right. These sets can't show what happens when both stages are unsure, and the labels are mostly short factual and arithmetic questions.
-- **Cost.** Each escalation is a thinking call of 6 to 9 seconds. That is the paper's trade-off: the stronger judge is paid for only on escalated items.
-- **Noise.** The held-out set has five first-stage errors, so the AUROC and selective-accuracy figures are noisy.
+**What this shows.** The harder set does what it was meant to do for the first stage: it is clearly worse on hard items, and the gate sends those items to the fallback. The gate caught every first-stage error and matched the fallback's accuracy while escalating about a third of items. But the thinking fallback still got all 373 labeled pairs right, including the hard ones. So this set still can't show what the cascade does when the fallback itself is wrong. The next round needs items that defeat an 8B reasoning model.
 
 ## Limits
 
@@ -155,7 +148,7 @@ Lower thresholds let first-stage errors through, and the sweep shows the cost.
 - **Small, hand-labeled set.** The paper evaluates on 1,850 preference pairs and more. The threshold fit uses 100 pairs and the fresh held-out set has 98, so differences of a few points are within noise. The bootstrap interval is about plus or minus 5 points.
 - **Temperature transfers unevenly.** The paper reports this too (section 7.2). The fit here may help or hurt on held-out pairs.
 - **Serial cascade only.** The paper's fusion and debate variants are not built.
-- **Easy labels.** The fallback is correct on all 275 labeled pairs, so these sets can't show how the cascade behaves when both stages are unsure. Harder, verified labels are the next step.
+- **Ceiling.** The thinking fallback is correct on all 373 labeled pairs, including 98 hard ones. These sets can't show what happens when the fallback is wrong. Items that defeat an 8B reasoning model are the next step.
 - **Temperature also changes the routing confidences.** `/api/coding-route` and `/api/task-complexity` use the same first-stage model, so with `policy.json` they report temperature-scaled confidence. Temperature is monotone, so the chosen role does not change.
 - **Escalation rule.** `JEV_POLICY` lets you point at another policy file for tests. The policy is only as good as its selection split.
 - **No auth.** It binds to loopback. Do not expose it.

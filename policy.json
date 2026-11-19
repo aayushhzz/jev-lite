@@ -1,6 +1,6 @@
 {
-  "tau": 0.99,
-  "temperature": 4.0,
+  "tau": 0.95,
+  "temperature": 6.0,
   "rule": "lower_bound",
   "margin": -0.02,
   "grid": [
@@ -14,8 +14,8 @@
   ],
   "first_stage_model": "qwen3:4b-instruct",
   "fallback_model": "qwen3:8b",
-  "selection_pairs": 100,
-  "selection_nll_at_T1": 0.2114,
-  "selection_nll_at_T": 0.1048,
-  "point_rule_tau_for_comparison": 0.7
+  "selection_pairs": 150,
+  "selection_nll_at_T1": 0.5116,
+  "selection_nll_at_T": 0.207,
+  "point_rule_tau_for_comparison": 0.9
 }

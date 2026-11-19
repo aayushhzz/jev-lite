@@ -1,7 +1,7 @@
 {
   "policy": {
-    "tau": 0.99,
-    "temperature": 4.0,
+    "tau": 0.95,
+    "temperature": 6.0,
     "rule": "lower_bound",
     "margin": -0.02,
     "grid": [
@@ -15,22 +15,76 @@
     ],
     "first_stage_model": "qwen3:4b-instruct",
     "fallback_model": "qwen3:8b",
-    "selection_pairs": 100,
-    "selection_nll_at_T1": 0.2114,
-    "selection_nll_at_T": 0.1048,
-    "point_rule_tau_for_comparison": 0.7
+    "selection_pairs": 150,
+    "selection_nll_at_T1": 0.5116,
+    "selection_nll_at_T": 0.207,
+    "point_rule_tau_for_comparison": 0.9
   },
   "selection_counts": {
-    "select": 100,
-    "heldout_fresh": 98,
+    "select": 150,
+    "heldout_fresh": 146,
     "legacy_previously_inspected": 77
   },
+  "heldout_subgroups_calibrated": {
+    "easy_heldout_calibrated": {
+      "n": 98,
+      "valid_first_stage": 98,
+      "accuracy": {
+        "cascade": 1.0,
+        "first_stage_alone": 0.949,
+        "fallback_alone": 1.0
+      },
+      "cascade_minus_fallback_pp": {
+        "mean": 0.0,
+        "bootstrap_95": [
+          0.0,
+          0.0
+        ]
+      },
+      "escalated_pct": 24.5,
+      "first_stage_errors_caught_pct": 100.0,
+      "first_stage_quality": {
+        "ece_10_bins": 0.0362,
+        "brier_mean": 0.0864,
+        "nll_mean": 0.1484,
+        "error_auroc_of_1_minus_q": 0.9118,
+        "selective_accuracy_at_80_pct_coverage": 0.9873,
+        "selective_accuracy_at_50_pct_coverage": 1.0
+      }
+    },
+    "hard_heldout_calibrated": {
+      "n": 48,
+      "valid_first_stage": 48,
+      "accuracy": {
+        "cascade": 1.0,
+        "first_stage_alone": 0.875,
+        "fallback_alone": 1.0
+      },
+      "cascade_minus_fallback_pp": {
+        "mean": 0.0,
+        "bootstrap_95": [
+          0.0,
+          0.0
+        ]
+      },
+      "escalated_pct": 47.9,
+      "first_stage_errors_caught_pct": 100.0,
+      "first_stage_quality": {
+        "ece_10_bins": 0.0685,
+        "brier_mean": 0.1444,
+        "nll_mean": 0.228,
+        "error_auroc_of_1_minus_q": 0.9325,
+        "selective_accuracy_at_80_pct_coverage": 0.9487,
+        "selective_accuracy_at_50_pct_coverage": 1.0
+      }
+    }
+  },
   "heldout_fresh_offline_uncalibrated_T1": {
-    "n": 98,
-    "valid_first_stage": 98,
+    "n": 146,
+    "valid_first_stage": 146,
     "accuracy": {
       "cascade": 1.0,
-      "first_stage_alone": 0.949,
+      "first_stage_alone": 0.9247,
       "fallback_alone": 1.0
     },
     "cascade_minus_fallback_pp": {
@@ -43,20 +97,20 @@
     "escalated_pct": 100.0,
     "first_stage_errors_caught_pct": 100.0,
     "first_stage_quality": {
-      "ece_10_bins": 0.0561,
-      "brier_mean": 0.1013,
-      "nll_mean": 0.3395,
-      "error_auroc_of_1_minus_q": 0.914,
-      "selective_accuracy_at_80_pct_coverage": 0.9873,
+      "ece_10_bins": 0.0507,
+      "brier_mean": 0.118,
+      "nll_mean": 0.3185,
+      "error_auroc_of_1_minus_q": 0.9253,
+      "selective_accuracy_at_80_pct_coverage": 0.9915,
       "selective_accuracy_at_50_pct_coverage": 1.0
     }
   },
   "heldout_fresh_offline_calibrated": {
-    "n": 98,
-    "valid_first_stage": 98,
+    "n": 146,
+    "valid_first_stage": 146,
     "accuracy": {
       "cascade": 1.0,
-      "first_stage_alone": 0.949,
+      "first_stage_alone": 0.9247,
       "fallback_alone": 1.0
     },
     "cascade_minus_fallback_pp": {
@@ -66,27 +120,27 @@
         0.0
       ]
     },
-    "escalated_pct": 29.6,
+    "escalated_pct": 32.2,
     "first_stage_errors_caught_pct": 100.0,
     "first_stage_quality": {
-      "ece_10_bins": 0.0272,
-      "brier_mean": 0.0888,
-      "nll_mean": 0.1478,
-      "error_auroc_of_1_minus_q": 0.9097,
-      "selective_accuracy_at_80_pct_coverage": 0.9873,
+      "ece_10_bins": 0.0175,
+      "brier_mean": 0.1055,
+      "nll_mean": 0.1746,
+      "error_auroc_of_1_minus_q": 0.9246,
+      "selective_accuracy_at_80_pct_coverage": 0.9915,
       "selective_accuracy_at_50_pct_coverage": 1.0
     }
   },
   "heldout_fresh_live_frozen_cascade": {
     "accuracy": 1.0,
-    "escalated_pct": 29.6,
+    "escalated_pct": 32.2,
     "gate_agreement_with_offline_pct": 100.0,
     "latency_ms": {
-      "cascade_p50": 224.5,
-      "cascade_p95": 12054.8,
-      "first_path_p50": 217.7,
-      "escalated_p50": 9221.0,
-      "fallback_alone_p50": 6425.0
+      "cascade_p50": 219.0,
+      "cascade_p95": 16386.9,
+      "first_path_p50": 215.2,
+      "escalated_p50": 10789.2,
+      "fallback_alone_p50": 7198.6
     }
   },
   "legacy_previously_inspected_calibrated": {
@@ -107,10 +161,10 @@
     "escalated_pct": 14.3,
     "first_stage_errors_caught_pct": 100.0,
     "first_stage_quality": {
-      "ece_10_bins": 0.0421,
-      "brier_mean": 0.067,
-      "nll_mean": 0.0973,
-      "error_auroc_of_1_minus_q": 0.9833,
+      "ece_10_bins": 0.0471,
+      "brier_mean": 0.0644,
+      "nll_mean": 0.1055,
+      "error_auroc_of_1_minus_q": 0.9806,
       "selective_accuracy_at_80_pct_coverage": 1.0,
       "selective_accuracy_at_50_pct_coverage": 1.0
     }
@@ -119,36 +173,36 @@
     {
       "tau": 0.5,
       "escalated_pct": 0.0,
-      "cascade_minus_fallback_pp": -5.1
+      "cascade_minus_fallback_pp": -7.53
     },
     {
       "tau": 0.6,
-      "escalated_pct": 4.1,
-      "cascade_minus_fallback_pp": -4.08
+      "escalated_pct": 7.5,
+      "cascade_minus_fallback_pp": -4.11
     },
     {
       "tau": 0.7,
-      "escalated_pct": 7.1,
-      "cascade_minus_fallback_pp": -3.06
+      "escalated_pct": 12.3,
+      "cascade_minus_fallback_pp": -2.74
     },
     {
       "tau": 0.8,
-      "escalated_pct": 8.2,
-      "cascade_minus_fallback_pp": -3.06
+      "escalated_pct": 15.1,
+      "cascade_minus_fallback_pp": -2.05
     },
     {
       "tau": 0.9,
-      "escalated_pct": 12.2,
-      "cascade_minus_fallback_pp": -2.04
+      "escalated_pct": 24.0,
+      "cascade_minus_fallback_pp": -0.68
     },
     {
       "tau": 0.95,
-      "escalated_pct": 19.4,
-      "cascade_minus_fallback_pp": -1.02
+      "escalated_pct": 32.2,
+      "cascade_minus_fallback_pp": 0.0
     },
     {
       "tau": 0.99,
-      "escalated_pct": 29.6,
+      "escalated_pct": 100.0,
       "cascade_minus_fallback_pp": 0.0
     }
   ]
