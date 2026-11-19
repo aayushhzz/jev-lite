@@ -33,7 +33,8 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "bench"))
 
 import server  # noqa: E402
-from pairs import PAIRS  # noqa: E402
+from pairs import PAIRS  # noqa: E402  (legacy held-out and the first 75 selection pairs)
+from pairs_extra import EXTRA_SELECT, HELDOUT  # noqa: E402
 
 FIRST = os.environ.get("JEV_MODEL", "qwen3:4b-instruct")
 FALLBACK = os.environ.get("JEV_FALLBACK_MODEL", "qwen3:8b")
@@ -239,12 +240,13 @@ def run_live(live: server.JevLite, items: List[Dict[str, Any]]) -> List[Dict[str
 
 def main() -> None:
     RESULTS.mkdir(parents=True, exist_ok=True)
-    items = orient(PAIRS)
+    items = orient(PAIRS + EXTRA_SELECT + HELDOUT)
     select = [i for i in items if i["split"] == "select"]
-    test = [i for i in items if i["split"] == "test"]
+    test = [i for i in items if i["split"] == "heldout"]  # fresh: scored once, after the policy is frozen
+    legacy = [i for i in items if i["split"] == "legacy"]  # previously inspected: a sanity check only
     first = server.JevLite(server.OllamaStepModel(model=FIRST))  # temperature 1.0 on purpose: raw orders
     fallback = server.JevLite(server.OllamaStepModel(model=FALLBACK))
-    print(f"selection pairs: {len(select)}, held-out pairs: {len(test)}; first={FIRST} fallback={FALLBACK}")
+    print(f"select: {len(select)}, heldout (fresh): {len(test)}, legacy: {len(legacy)}; first={FIRST} fallback={FALLBACK}")
 
     # 1-2. Selection set: raw judgments, then a temperature.
     raw_select = judge_raw(first, fallback, select)
@@ -295,11 +297,27 @@ def main() -> None:
             "fallback_alone_p50": round(statistics.median(r["fallback_ms"] for r in raw_test), 1),
         },
     }
+    # Legacy set (inspected earlier): reported only as a sanity check on the same frozen policy.
+    raw_legacy = judge_raw(first, fallback, legacy)
+    legacy_T = materialize(raw_legacy, T)
+    legacy_summary = summarize(legacy_T, simulate(legacy_T, tau_cal))
+
+    # Post hoc sweep on the fresh held-out set. Printed for reading only; the policy is not changed by it.
+    sweep = []
+    for tau in GRID:
+        rows = simulate(test_T, tau)
+        sweep.append({"tau": tau,
+                      "escalated_pct": round(100 * sum(1 for r in rows if not r["accepted"]) / len(rows), 1),
+                      "cascade_minus_fallback_pp": round(100 * statistics.mean(r["cascade"] - r["fallback"] for r in rows), 2)})
+
     report = {
         "policy": policy,
-        "held_out_offline_uncalibrated_T1": offline_uncal,
-        "held_out_offline_calibrated": offline_cal,
-        "held_out_live_frozen_cascade": live_summary,
+        "selection_counts": {"select": len(select), "heldout_fresh": len(test), "legacy_previously_inspected": len(legacy)},
+        "heldout_fresh_offline_uncalibrated_T1": offline_uncal,
+        "heldout_fresh_offline_calibrated": offline_cal,
+        "heldout_fresh_live_frozen_cascade": live_summary,
+        "legacy_previously_inspected_calibrated": legacy_summary,
+        "post_hoc_sweep_on_heldout_fresh_NOT_used_for_policy": sweep,
     }
     (RESULTS / "summary.json").write_text(json.dumps(report, indent=2))
     (RESULTS / "live_rows.json").write_text(json.dumps(live_rows, indent=2))

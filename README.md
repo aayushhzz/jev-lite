@@ -91,60 +91,68 @@ The harness follows the paper's order of operations:
 3. Judge the held-out pairs offline, and run the frozen cascade live through the server's own method.
 4. Report accuracy, escalation rate, paired difference against the fallback with a 2,000-resample bootstrap, ECE over 10 bins, Brier, NLL, error AUROC of 1 - q, and selective accuracy at 80% and 50% coverage.
 
-The labels are 75 selection pairs and 77 held-out pairs, written by hand in [`bench/pairs.py`](bench/pairs.py). Each correct answer was fixed when its pair was written, and the position of the correct answer is randomized. The set is small and was written by one person, so the results are a sanity check, not a benchmark.
+The labels are 100 selection pairs, 98 fresh held-out pairs, and 77 legacy pairs. They are hand-written in [`bench/pairs.py`](bench/pairs.py) and [`bench/pairs_extra.py`](bench/pairs_extra.py). Each correct answer was fixed when its pair was written, and the position of the correct answer is randomized. The sets are small and written by one person, so the results are a sanity check, not a benchmark.
 
 ## Results
 
-Hardware: Apple M2 Pro, 16 GB, Ollama 0.40.16. First stage `qwen3:4b-instruct` (two orders). Fallback `qwen3:8b`, one order, thinking disabled (see Limits). Raw outputs are in [`bench/results/`](bench/results/).
+Hardware: Apple M2 Pro, 16 GB, Ollama 0.40.16. First stage `qwen3:4b-instruct`, two orders. Fallback `qwen3:8b`, one order, thinking disabled (see Limits). Raw judgments and full metrics are in [`bench/results/`](bench/results/).
 
-**Selection split (75 pairs, used to fit T and tau)**
+Three sets: 100 selection pairs (fit T and tau), 98 fresh held-out pairs (scored once, after the policy was frozen), and 77 legacy pairs from the first set. I had already inspected the legacy pairs, so they are a sanity check only.
+
+**Selection (100 pairs)**
 
 | | First stage | Fallback |
 | --- | --- | --- |
-| Accuracy (ties at half credit) | 96.0% | 90.7% |
+| Accuracy (ties at half credit) | 96% | 92% |
 
-The temperature fit picked T = 4.0. Selection NLL fell from 0.245 to 0.098. The lower-bound rule picked tau = 0.5. Because every confidence is at least 0.5, that setting escalates nothing. This is the paper's documented case: the first stage matches or beats the fallback on the selection split, so the rule accepts everything.
+The temperature fit picked T = 4.0, and selection NLL fell from 0.211 to 0.105. The lower-bound rule picked tau = 0.5. Every confidence is at least 0.5, so the frozen gate escalates nothing.
 
-**Held-out split (77 pairs, scored once)**
+**Fresh held-out (98 pairs)**
 
 | Metric | Value |
 | --- | --- |
-| First stage alone | 93.5% (72/77) |
-| Fallback alone | 96.1% (74/77) |
-| Frozen cascade, live | 93.5%, escalated 0% |
-| Cascade minus fallback | -2.6 points, 95% bootstrap interval [-9.1, +3.9] |
+| First stage alone | 94.9% (93/98) |
+| Fallback alone | 92.9% (91/98) |
+| Frozen cascade, live | 94.9%, escalated 0% |
+| Cascade minus fallback | +2.0 points, 95% bootstrap interval [-3.1, +7.1] |
 | Live decisions agreeing with offline simulation | 100% |
-| ECE, 10 bins (T = 1 to T = 4) | 0.046 to 0.042 |
-| Brier (T = 1 to T = 4) | 0.072 to 0.067 |
-| NLL (T = 1 to T = 4) | 0.178 to 0.097 |
-| Error AUROC of 1 - q | 0.98 (5 first-stage errors, so very noisy) |
-| Latency, p50: first-stage path / fallback alone | 213 ms / 232 ms |
+| ECE, 10 bins (T = 1 to T = 4) | 0.056 to 0.027 |
+| Brier (T = 1 to T = 4) | 0.101 to 0.089 |
+| NLL (T = 1 to T = 4) | 0.340 to 0.148 |
+| Error AUROC of 1 - q | 0.91 |
+| Latency, p50: first-stage path / fallback alone | 215 ms / 236 ms |
 
-Temperature scaling improved held-out NLL here. The paper found it helped one dataset and hurt two.
+Temperature scaling improved calibration on this set, which the paper saw on only one of its three datasets.
 
-**Post hoc threshold sweep (not used for the policy)**
+**Legacy set (77 pairs, previously inspected)**
+
+The same frozen policy gives 93.5% against the fallback's 96.1%, a difference of -2.6 points with a 95% interval of [-9.1, +3.9].
+
+**Post hoc threshold sweep (fresh held-out, not used for the policy)**
 
 These numbers score thresholds on the held-out set, so they are for reading only. Choosing tau from them would fit the test set.
 
 | tau | Escalated | Cascade minus fallback |
 | --- | --- | --- |
-| 0.5 (frozen) | 0% | -2.6 points |
-| 0.7 | 3.9% | 0.0 |
-| 0.8 | 5.2% | 0.0 |
-| 0.9 | 13.0% | +1.3 |
-| 0.99 | 14.3% | +1.3 |
+| 0.5 (frozen) | 0% | +2.0 |
+| 0.6 | 4.1% | +2.0 |
+| 0.7 | 7.1% | +2.0 |
+| 0.8 | 8.2% | +2.0 |
+| 0.9 | 12.2% | +2.0 |
+| 0.95 | 19.4% | 0.0 |
+| 0.99 | 29.6% | 0.0 |
 
-**Live escalation check.** A second server with tau = 0.99 escalated one pair: the eraser problem, where the wrong answer was offered first. Both stages picked the wrong answer, so the escalated path runs correctly but did not help on that item. Total latency for the escalated path was 639 ms.
+Escalating more items lowers accuracy against the first stage alone. On those items the fallback is often wrong where the first stage is right.
 
-**What this shows.** The architecture runs end to end: the two-order gate, temperature scaling, a frozen threshold, the cascade endpoint, and live escalation. The frozen threshold did not transfer. The selection split is small (75 pairs), and the fallback ran with thinking disabled, so it is not the stronger judge the paper assumes.
+**What this shows.** The larger set confirms the earlier result. The threshold rule escalates nothing, so the cascade equals the first stage. The limit now is the fallback. Without thinking, the 8B model is less accurate than the two-order 4B first stage on both selection and held-out pairs, so escalating adds no accuracy. The paper's cascade needs a stronger fallback, and this build doesn't have one. A live escalation check on an earlier run (tau = 0.99) confirmed that the escalated path returns the fallback's decision.
 
 ## Limits
 
 - **Not Jev.** The paper's hosted model was trained with a method that is not published. This build uses generic local models, so the gap to the paper's accuracy and calibration is expected.
-- **Small, hand-labeled set.** The paper evaluates on 1,850 preference pairs and more. Threshold fits on 75 pairs are noisy, and the lower-bound rule tends to escalate more when labels are few.
+- **Small, hand-labeled set.** The paper evaluates on 1,850 preference pairs and more. The threshold fit uses 100 pairs and the fresh held-out set has 98, so differences of a few points are within noise. The bootstrap interval is about plus or minus 5 points.
 - **Temperature transfers unevenly.** The paper reports this too (section 7.2). The fit here may help or hurt on held-out pairs.
 - **Serial cascade only.** The paper's fusion and debate variants are not built.
-- **The fallback is not the stronger judge here.** Qwen3's thinking mode would make the 8B model stronger, but a one-token logprob read cannot use it, so `reasoning_effort: "none"` turns thinking off. On the selection split the 4B first stage beat it (96% against 91%). The paper's fallback is a reasoning model.
+- **The fallback is not the stronger judge here.** Qwen3's thinking mode would make the 8B model stronger, but a one-token logprob read cannot use it, so `reasoning_effort: "none"` turns thinking off. On the selection set the 4B first stage beats it (96% against 92%). The paper's fallback is a reasoning model. The next step is a fallback with thinking enabled, which needs its own read path, since a logprob read takes one token.
 - **Temperature also changes the routing confidences.** `/api/coding-route` and `/api/task-complexity` use the same first-stage model, so with `policy.json` they report temperature-scaled confidence. Temperature is monotone, so the chosen role does not change.
 - **Escalation rule.** `JEV_POLICY` lets you point at another policy file for tests. The policy is only as good as its selection split.
 - **No auth.** It binds to loopback. Do not expose it.

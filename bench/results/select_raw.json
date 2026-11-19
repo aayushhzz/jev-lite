@@ -5,18 +5,18 @@
     "p_ab": 6.349208613562066e-10,
     "p_ba": 0.9999999999762283,
     "c2": 1.0,
-    "first_ms": 1616.1,
-    "fallback_ms": 2006.8,
+    "first_ms": 882.4,
+    "fallback_ms": 1098.2,
     "question": "What is 17 x 23?"
   },
   {
     "id": "select-001",
     "truth": "b",
-    "p_ab": 3.5291750463303446e-12,
-    "p_ba": 0.9999999999966265,
+    "p_ab": 3.527734827698533e-12,
+    "p_ba": 0.999999999996569,
     "c2": 1.0,
-    "first_ms": 8526.9,
-    "fallback_ms": 318.8,
+    "first_ms": 197.9,
+    "fallback_ms": 255.0,
     "question": "What is the capital of Australia?"
   },
   {
@@ -25,18 +25,18 @@
     "p_ab": 0.999999999554438,
     "p_ba": 1.1952637220396151e-09,
     "c2": 1.0,
-    "first_ms": 142.4,
-    "fallback_ms": 233.0,
+    "first_ms": 144.4,
+    "fallback_ms": 236.2,
     "question": "Which planet is closest to the Sun?"
   },
   {
     "id": "select-003",
     "truth": "b",
-    "p_ab": 3.8378935175481975e-10,
-    "p_ba": 0.9999999999964873,
+    "p_ab": 3.8718622917146544e-10,
+    "p_ba": 0.9999999999965001,
     "c2": 1.0,
-    "first_ms": 141.7,
-    "fallback_ms": 228.8,
+    "first_ms": 140.2,
+    "fallback_ms": 232.7,
     "question": "What is the chemical symbol for potassium?"
   },
   {
@@ -45,18 +45,18 @@
     "p_ab": 0.9999999999974383,
     "p_ba": 1.2194491298771288e-10,
     "c2": 1.0,
-    "first_ms": 212.3,
-    "fallback_ms": 234.1,
+    "first_ms": 215.1,
+    "fallback_ms": 245.3,
     "question": "Who wrote 'Pride and Prejudice'?"
   },
   {
     "id": "select-005",
     "truth": "b",
-    "p_ab": 4.390934476835126e-07,
-    "p_ba": 0.37677359259082704,
+    "p_ab": 4.419873055114482e-07,
+    "p_ba": 0.37811637363624323,
     "c2": 1.0,
-    "first_ms": 215.5,
-    "fallback_ms": 234.7,
+    "first_ms": 218.1,
+    "fallback_ms": 240.5,
     "question": "In Python, what does len([1, [2, 3], 4]) return?"
   },
   {
@@ -65,8 +65,8 @@
     "p_ab": 6.193172095872797e-09,
     "p_ba": 0.9999999999668598,
     "c2": 1.0,
-    "first_ms": 210.8,
-    "fallback_ms": 230.6,
+    "first_ms": 221.0,
+    "fallback_ms": 240.0,
     "question": "What is the derivative of x cubed?"
   },
   {
@@ -75,18 +75,18 @@
     "p_ab": 0.9999999999995366,
     "p_ba": 2.1414196831390415e-11,
     "c2": 1.0,
-    "first_ms": 215.3,
-    "fallback_ms": 230.7,
+    "first_ms": 215.8,
+    "fallback_ms": 231.2,
     "question": "How many bits are in a byte?"
   },
   {
     "id": "select-008",
     "truth": "b",
-    "p_ab": 4.4253216254486e-11,
-    "p_ba": 0.9999999999991083,
+    "p_ab": 4.4448879338833075e-11,
+    "p_ba": 0.9999999999991069,
     "c2": 1.0,
-    "first_ms": 214.4,
-    "fallback_ms": 231.0,
+    "first_ms": 224.8,
+    "fallback_ms": 238.7,
     "question": "Which gas makes up most of Earth's atmosphere?"
   },
   {
@@ -95,8 +95,8 @@
     "p_ab": 6.0646741986646e-11,
     "p_ba": 0.9999999999993257,
     "c2": 1.0,
-    "first_ms": 211.8,
-    "fallback_ms": 232.6,
+    "first_ms": 217.4,
+    "fallback_ms": 236.7,
     "question": "What is the sum of the interior angles of a triangle?"
   },
   {
@@ -105,8 +105,8 @@
     "p_ab": 1.124981474312822e-09,
     "p_ba": 0.9999999997921365,
     "c2": 1.0,
-    "first_ms": 214.6,
-    "fallback_ms": 235.8,
+    "first_ms": 218.5,
+    "fallback_ms": 238.9,
     "question": "A train travels 60 km in 1.5 hours. What is its average speed?"
   },
   {
@@ -115,8 +115,8 @@
     "p_ab": 5.457925564816487e-12,
     "p_ba": 0.9999999999993214,
     "c2": 1.0,
-    "first_ms": 341.1,
-    "fallback_ms": 236.6,
+    "first_ms": 217.2,
+    "fallback_ms": 232.7,
     "question": "In which year did the Berlin Wall fall?"
   },
   {
@@ -125,8 +125,8 @@
     "p_ab": 1.3354651639610453e-08,
     "p_ba": 0.9999999999943585,
     "c2": 1.0,
-    "first_ms": 186.8,
-    "fallback_ms": 231.6,
+    "first_ms": 189.3,
+    "fallback_ms": 235.4,
     "question": "In SQL, which keyword removes duplicate rows from a result?"
   },
   {
@@ -135,8 +135,8 @@
     "p_ab": 0.9999999991075983,
     "p_ba": 7.053014374905042e-11,
     "c2": 1.0,
-    "first_ms": 216.5,
-    "fallback_ms": 231.4,
+    "first_ms": 219.0,
+    "fallback_ms": 233.1,
     "question": "What is the next prime number after 23?"
   },
   {
@@ -145,8 +145,8 @@
     "p_ab": 4.34593234125241e-11,
     "p_ba": 0.9999999999925606,
     "c2": 1.0,
-    "first_ms": 211.2,
-    "fallback_ms": 233.1,
+    "first_ms": 212.8,
+    "fallback_ms": 233.4,
     "question": "What is 2 to the power of 10?"
   },
   {
@@ -155,8 +155,8 @@
     "p_ab": 2.0154336826842456e-11,
     "p_ba": 0.99999999999833,
     "c2": 1.0,
-    "first_ms": 185.3,
-    "fallback_ms": 234.4,
+    "first_ms": 193.5,
+    "fallback_ms": 239.8,
     "question": "If all bloops are razzies and all razzies are lazzies, are all bloops lazzies?"
   },
   {
@@ -165,8 +165,8 @@
     "p_ab": 0.9999999999995521,
     "p_ba": 1.1076405302087899e-11,
     "c2": 1.0,
-    "first_ms": 211.1,
-    "fallback_ms": 234.7,
+    "first_ms": 214.9,
+    "fallback_ms": 236.0,
     "question": "Which organelle produces most of a cell's ATP?"
   },
   {
@@ -175,18 +175,18 @@
     "p_ab": 0.9999999999269324,
     "p_ba": 3.774227390435618e-11,
     "c2": 1.0,
-    "first_ms": 214.4,
-    "fallback_ms": 236.3,
+    "first_ms": 214.3,
+    "fallback_ms": 234.6,
     "question": "What is the boiling point of water at sea level in Fahrenheit?"
   },
   {
     "id": "select-018",
     "truth": "a",
-    "p_ab": 0.9999999999950884,
-    "p_ba": 1.3943955686027511e-10,
+    "p_ab": 0.9999999999950084,
+    "p_ba": 1.404011103918147e-10,
     "c2": 1.0,
-    "first_ms": 214.1,
-    "fallback_ms": 232.9,
+    "first_ms": 217.1,
+    "fallback_ms": 234.7,
     "question": "Who developed the theory of general relativity?"
   },
   {
@@ -195,8 +195,8 @@
     "p_ab": 7.819031059039154e-11,
     "p_ba": 0.9999999999952969,
     "c2": 1.0,
-    "first_ms": 214.6,
-    "fallback_ms": 233.6,
+    "first_ms": 217.5,
+    "fallback_ms": 233.5,
     "question": "What is the time complexity of binary search on a sorted array?"
   },
   {
@@ -205,38 +205,38 @@
     "p_ab": 0.9999999999990976,
     "p_ba": 9.921631812348278e-12,
     "c2": 1.0,
-    "first_ms": 139.9,
-    "fallback_ms": 231.5,
+    "first_ms": 147.5,
+    "fallback_ms": 238.5,
     "question": "Which language is primarily spoken in Brazil?"
   },
   {
     "id": "select-021",
     "truth": "b",
-    "p_ab": 2.4032858419843273e-11,
-    "p_ba": 0.9999999999994331,
+    "p_ab": 2.4094361295467708e-11,
+    "p_ba": 0.9999999999994347,
     "c2": 1.0,
-    "first_ms": 215.7,
-    "fallback_ms": 232.9,
+    "first_ms": 226.0,
+    "fallback_ms": 235.3,
     "question": "How many sides does a dodecagon have?"
   },
   {
     "id": "select-022",
     "truth": "a",
-    "p_ab": 0.9999999999548383,
-    "p_ba": 7.64736786559012e-10,
+    "p_ab": 0.9999999999544584,
+    "p_ba": 7.649643650823742e-10,
     "c2": 1.0,
-    "first_ms": 214.1,
-    "fallback_ms": 231.8,
+    "first_ms": 213.8,
+    "fallback_ms": 231.0,
     "question": "What does HTTP status 404 mean?"
   },
   {
     "id": "select-023",
     "truth": "b",
-    "p_ab": 9.137670622598332e-07,
-    "p_ba": 0.9999993483388319,
+    "p_ab": 8.997514372740509e-07,
+    "p_ba": 0.9999993634952418,
     "c2": 0.0,
-    "first_ms": 216.0,
-    "fallback_ms": 230.5,
+    "first_ms": 216.9,
+    "fallback_ms": 232.6,
     "question": "What is 15% of 240?"
   },
   {
@@ -245,8 +245,8 @@
     "p_ab": 5.545956732583095e-09,
     "p_ba": 0.9999999998677964,
     "c2": 1.0,
-    "first_ms": 253.5,
-    "fallback_ms": 230.5,
+    "first_ms": 172.8,
+    "fallback_ms": 234.7,
     "question": "Which element has atomic number 6?"
   },
   {
@@ -255,18 +255,18 @@
     "p_ab": 5.872416464313416e-10,
     "p_ba": 0.9999999999984914,
     "c2": 1.0,
-    "first_ms": 210.6,
-    "fallback_ms": 231.2,
+    "first_ms": 220.6,
+    "fallback_ms": 237.7,
     "question": "In what year did the Titanic sink?"
   },
   {
     "id": "select-026",
     "truth": "b",
-    "p_ab": 1.1460363122233107e-10,
-    "p_ba": 0.9999999999909026,
+    "p_ab": 1.1514701629252848e-10,
+    "p_ba": 0.9999999999909392,
     "c2": 1.0,
-    "first_ms": 214.5,
-    "fallback_ms": 230.8,
+    "first_ms": 236.5,
+    "fallback_ms": 236.3,
     "question": "What is the square root of 144?"
   },
   {
@@ -275,8 +275,8 @@
     "p_ab": 0.9999999999773546,
     "p_ba": 1.4217565370601283e-10,
     "c2": 1.0,
-    "first_ms": 216.9,
-    "fallback_ms": 235.0,
+    "first_ms": 223.1,
+    "fallback_ms": 242.7,
     "question": "Which sorting algorithm is stable and has O(n log n) worst-case time?"
   },
   {
@@ -285,8 +285,8 @@
     "p_ab": 3.250845605733428e-11,
     "p_ba": 0.9999999999973641,
     "c2": 1.0,
-    "first_ms": 211.4,
-    "fallback_ms": 236.5,
+    "first_ms": 215.3,
+    "fallback_ms": 237.6,
     "question": "How many minutes are in a day?"
   },
   {
@@ -295,8 +295,8 @@
     "p_ab": 0.9999999999839466,
     "p_ba": 2.2930925734705511e-10,
     "c2": 1.0,
-    "first_ms": 144.9,
-    "fallback_ms": 232.5,
+    "first_ms": 144.1,
+    "fallback_ms": 233.4,
     "question": "What is the largest ocean on Earth?"
   },
   {
@@ -305,18 +305,18 @@
     "p_ab": 0.999999999999658,
     "p_ba": 4.3743240363478514e-11,
     "c2": 1.0,
-    "first_ms": 169.7,
-    "fallback_ms": 228.5,
+    "first_ms": 170.2,
+    "fallback_ms": 230.3,
     "question": "What is the value of 0 factorial?"
   },
   {
     "id": "select-031",
     "truth": "b",
-    "p_ab": 3.946945923361671e-11,
-    "p_ba": 0.9999999999979077,
+    "p_ab": 3.906636390394417e-11,
+    "p_ba": 0.9999999999978901,
     "c2": 1.0,
-    "first_ms": 214.6,
-    "fallback_ms": 231.6,
+    "first_ms": 217.6,
+    "fallback_ms": 233.2,
     "question": "Which Shakespeare play features the character Iago?"
   },
   {
@@ -325,8 +325,8 @@
     "p_ab": 0.9999999999988283,
     "p_ba": 7.003682298470593e-11,
     "c2": 1.0,
-    "first_ms": 220.6,
-    "fallback_ms": 237.8,
+    "first_ms": 219.2,
+    "fallback_ms": 235.4,
     "question": "If you flip two fair coins, what is the probability both are heads?"
   },
   {
@@ -335,8 +335,8 @@
     "p_ab": 5.1293104499923425e-12,
     "p_ba": 0.9999999999987901,
     "c2": 1.0,
-    "first_ms": 139.0,
-    "fallback_ms": 228.6,
+    "first_ms": 140.9,
+    "fallback_ms": 229.5,
     "question": "What is the capital of Canada?"
   },
   {
@@ -345,8 +345,8 @@
     "p_ab": 0.9999997650661352,
     "p_ba": 0.9999997580178095,
     "c2": 1.0,
-    "first_ms": 213.5,
-    "fallback_ms": 319.4,
+    "first_ms": 215.0,
+    "fallback_ms": 323.1,
     "question": "A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much is the ball?"
   },
   {
@@ -355,8 +355,8 @@
     "p_ab": 1.4351750058998015e-10,
     "p_ba": 0.9999999999837648,
     "c2": 1.0,
-    "first_ms": 217.3,
-    "fallback_ms": 237.8,
+    "first_ms": 227.3,
+    "fallback_ms": 97.6,
     "question": "Approximately how fast does light travel in a vacuum?"
   },
   {
@@ -365,28 +365,28 @@
     "p_ab": 0.9999999999764051,
     "p_ba": 3.6076579701015045e-10,
     "c2": 1.0,
-    "first_ms": 221.2,
-    "fallback_ms": 244.3,
+    "first_ms": 219.0,
+    "fallback_ms": 236.8,
     "question": "In Git, which command shows the commit history?"
   },
   {
     "id": "select-037",
     "truth": "b",
-    "p_ab": 5.284516800809161e-12,
-    "p_ba": 0.9999999999994746,
+    "p_ab": 5.27466832053295e-12,
+    "p_ba": 0.9999999999994669,
     "c2": 1.0,
-    "first_ms": 215.7,
-    "fallback_ms": 235.4,
+    "first_ms": 219.8,
+    "fallback_ms": 234.8,
     "question": "How many cards are in a standard deck without jokers?"
   },
   {
     "id": "select-038",
     "truth": "b",
-    "p_ab": 1.0844908719505558e-10,
-    "p_ba": 0.9999999999401838,
+    "p_ab": 1.0880628392880399e-10,
+    "p_ba": 0.999999999941259,
     "c2": 1.0,
-    "first_ms": 140.4,
-    "fallback_ms": 230.0,
+    "first_ms": 144.9,
+    "fallback_ms": 233.2,
     "question": "Which African country has the largest population?"
   },
   {
@@ -395,28 +395,28 @@
     "p_ab": 0.999999925222769,
     "p_ba": 1.317738202880911e-08,
     "c2": 1.0,
-    "first_ms": 215.5,
-    "fallback_ms": 232.6,
+    "first_ms": 224.5,
+    "fallback_ms": 235.0,
     "question": "What is 7 squared minus 7?"
   },
   {
     "id": "select-040",
     "truth": "b",
-    "p_ab": 1.1601620520546616e-11,
-    "p_ba": 0.9999999999999183,
+    "p_ab": 1.1628138397501917e-11,
+    "p_ba": 0.9999999999999176,
     "c2": 1.0,
-    "first_ms": 216.3,
-    "fallback_ms": 232.9,
+    "first_ms": 220.4,
+    "fallback_ms": 238.8,
     "question": "Which blood type is the universal donor for red blood cells?"
   },
   {
     "id": "select-041",
     "truth": "b",
-    "p_ab": 3.103621291304663e-05,
-    "p_ba": 0.9999891853762312,
+    "p_ab": 3.148335117482142e-05,
+    "p_ba": 0.9999894262608765,
     "c2": 0.0,
-    "first_ms": 219.5,
-    "fallback_ms": 234.1,
+    "first_ms": 228.4,
+    "fallback_ms": 237.1,
     "question": "A shirt costs $40 after a 20% discount. What was the original price?"
   },
   {
@@ -425,8 +425,8 @@
     "p_ab": 0.9999999999660303,
     "p_ba": 1.0321081863648663e-10,
     "c2": 1.0,
-    "first_ms": 216.7,
-    "fallback_ms": 234.5,
+    "first_ms": 216.6,
+    "fallback_ms": 233.7,
     "question": "Which number is the only even prime?"
   },
   {
@@ -435,8 +435,8 @@
     "p_ab": 0.9999999999981997,
     "p_ba": 7.298195708996369e-11,
     "c2": 1.0,
-    "first_ms": 215.9,
-    "fallback_ms": 231.7,
+    "first_ms": 226.7,
+    "fallback_ms": 236.4,
     "question": "What is the main gas in natural gas?"
   },
   {
@@ -445,68 +445,68 @@
     "p_ab": 1.1842407360768017e-11,
     "p_ba": 0.9999999999996669,
     "c2": 1.0,
-    "first_ms": 170.3,
-    "fallback_ms": 229.2,
+    "first_ms": 182.6,
+    "fallback_ms": 238.2,
     "question": "Who painted the Mona Lisa?"
   },
   {
     "id": "select-045",
     "truth": "a",
-    "p_ab": 0.9999999999808054,
-    "p_ba": 5.264426889513338e-08,
+    "p_ab": 0.9999999999809286,
+    "p_ba": 5.26414574630749e-08,
     "c2": 1.0,
-    "first_ms": 216.9,
-    "fallback_ms": 233.9,
+    "first_ms": 217.4,
+    "fallback_ms": 232.8,
     "question": "In JavaScript, what does typeof null return?"
   },
   {
     "id": "select-046",
     "truth": "a",
-    "p_ab": 0.9999999999975977,
-    "p_ba": 3.8415407095076424e-10,
+    "p_ab": 0.9999999999975862,
+    "p_ba": 3.817524402115117e-10,
     "c2": 1.0,
-    "first_ms": 217.2,
-    "fallback_ms": 232.1,
+    "first_ms": 219.4,
+    "fallback_ms": 233.4,
     "question": "What is the hexadecimal value FF in decimal?"
   },
   {
     "id": "select-047",
     "truth": "a",
-    "p_ab": 0.9999999992254278,
-    "p_ba": 1.3365558096537915e-08,
+    "p_ab": 0.9999999992185185,
+    "p_ba": 1.3397104341168926e-08,
     "c2": 1.0,
-    "first_ms": 220.5,
-    "fallback_ms": 239.8,
+    "first_ms": 222.0,
+    "fallback_ms": 237.8,
     "question": "In a 5-person round-robin tournament, how many matches are played?"
   },
   {
     "id": "select-048",
     "truth": "a",
-    "p_ab": 0.9999999999995999,
-    "p_ba": 9.100052471819135e-12,
+    "p_ab": 0.9999999999995997,
+    "p_ba": 9.131348715393805e-12,
     "c2": 1.0,
-    "first_ms": 225.6,
-    "fallback_ms": 233.1,
+    "first_ms": 221.6,
+    "fallback_ms": 237.4,
     "question": "Which vitamin does human skin produce on sun exposure?"
   },
   {
     "id": "select-049",
     "truth": "b",
-    "p_ab": 0.059730655456844715,
-    "p_ba": 0.9999999662294989,
+    "p_ab": 0.05907143085132124,
+    "p_ba": 0.9999999674932316,
     "c2": 0.0,
-    "first_ms": 221.3,
-    "fallback_ms": 233.9,
+    "first_ms": 216.1,
+    "fallback_ms": 232.0,
     "question": "What is the sum of the first 10 positive integers?"
   },
   {
     "id": "select-050",
     "truth": "a",
-    "p_ab": 0.9999999999996525,
-    "p_ba": 1.5612490809855668e-11,
+    "p_ab": 0.9999999999996552,
+    "p_ba": 1.5681909388450356e-11,
     "c2": 1.0,
-    "first_ms": 184.1,
-    "fallback_ms": 230.4,
+    "first_ms": 185.1,
+    "fallback_ms": 233.4,
     "question": "Which data structure follows last-in, first-out order?"
   },
   {
@@ -515,8 +515,8 @@
     "p_ab": 4.719753334534406e-10,
     "p_ba": 0.9999999936839798,
     "c2": 1.0,
-    "first_ms": 215.5,
-    "fallback_ms": 231.0,
+    "first_ms": 217.4,
+    "fallback_ms": 232.4,
     "question": "How many edges does the complete graph K4 have?"
   },
   {
@@ -525,8 +525,8 @@
     "p_ab": 1.9695820176407598e-09,
     "p_ba": 0.9999999999654356,
     "c2": 1.0,
-    "first_ms": 213.6,
-    "fallback_ms": 235.4,
+    "first_ms": 212.8,
+    "fallback_ms": 233.9,
     "question": "A rectangle is 8 cm by 5 cm. What is its area?"
   },
   {
@@ -535,28 +535,28 @@
     "p_ab": 0.9999999999949678,
     "p_ba": 7.238390336397561e-11,
     "c2": 1.0,
-    "first_ms": 173.0,
-    "fallback_ms": 233.1,
+    "first_ms": 179.3,
+    "fallback_ms": 239.2,
     "question": "Which river flows through Cairo?"
   },
   {
     "id": "select-054",
     "truth": "b",
-    "p_ab": 1.9176323147822936e-10,
-    "p_ba": 0.9999999999978182,
+    "p_ab": 1.9100468780102223e-10,
+    "p_ba": 0.999999999997812,
     "c2": 1.0,
-    "first_ms": 215.8,
-    "fallback_ms": 230.3,
+    "first_ms": 219.0,
+    "fallback_ms": 240.3,
     "question": "Which gas is most abundant in the Sun?"
   },
   {
     "id": "select-055",
     "truth": "b",
-    "p_ab": 0.0016741889419675453,
-    "p_ba": 0.9999926103463107,
+    "p_ab": 0.0016422855291481654,
+    "p_ba": 0.9999925263473541,
     "c2": 0.0,
-    "first_ms": 217.1,
-    "fallback_ms": 234.9,
+    "first_ms": 272.0,
+    "fallback_ms": 254.4,
     "question": "What is the next number in the sequence 2, 6, 12, 20, 30?"
   },
   {
@@ -565,18 +565,18 @@
     "p_ab": 2.748116811568472e-11,
     "p_ba": 0.9999999999997187,
     "c2": 1.0,
-    "first_ms": 139.7,
-    "fallback_ms": 233.7,
+    "first_ms": 153.1,
+    "fallback_ms": 237.6,
     "question": "Which company created the programming language Swift?"
   },
   {
     "id": "select-057",
     "truth": "a",
-    "p_ab": 0.9999999999710858,
-    "p_ba": 3.112792294713616e-09,
+    "p_ab": 0.9999999999713092,
+    "p_ba": 3.1496290804309636e-09,
     "c2": 1.0,
-    "first_ms": 214.7,
-    "fallback_ms": 230.5,
+    "first_ms": 230.0,
+    "fallback_ms": 245.5,
     "question": "In regular expressions, what does \\d match?"
   },
   {
@@ -585,8 +585,8 @@
     "p_ab": 0.9999999999990299,
     "p_ba": 5.908452601196388e-12,
     "c2": 1.0,
-    "first_ms": 216.3,
-    "fallback_ms": 232.4,
+    "first_ms": 229.1,
+    "fallback_ms": 240.6,
     "question": "How many degrees does a right angle measure?"
   },
   {
@@ -595,18 +595,18 @@
     "p_ab": 1.929500561981405e-07,
     "p_ba": 0.9999993052642014,
     "c2": 0.0,
-    "first_ms": 220.4,
-    "fallback_ms": 321.1,
+    "first_ms": 217.5,
+    "fallback_ms": 329.1,
     "question": "A pencil and an eraser cost 11 cents together. The pencil costs 10 cents more than the eraser. How much does the eraser cost?"
   },
   {
     "id": "select-060",
     "truth": "a",
-    "p_ab": 4.165986616254673e-06,
-    "p_ba": 0.8835503414621813,
+    "p_ab": 4.207109930126782e-06,
+    "p_ba": 0.883807960973877,
     "c2": 0.0,
-    "first_ms": 219.7,
-    "fallback_ms": 238.4,
+    "first_ms": 228.5,
+    "fallback_ms": 243.8,
     "question": "What is 1011 in binary, written in decimal?"
   },
   {
@@ -615,8 +615,8 @@
     "p_ab": 8.74672904740094e-12,
     "p_ba": 0.9999999999996476,
     "c2": 1.0,
-    "first_ms": 212.3,
-    "fallback_ms": 236.8,
+    "first_ms": 216.0,
+    "fallback_ms": 232.7,
     "question": "In what year did World War II end?"
   },
   {
@@ -625,8 +625,8 @@
     "p_ab": 0.9999999999617004,
     "p_ba": 4.2103285617504366e-10,
     "c2": 1.0,
-    "first_ms": 187.9,
-    "fallback_ms": 234.4,
+    "first_ms": 185.3,
+    "fallback_ms": 235.4,
     "question": "Which HTTP method is idempotent and replaces a resource?"
   },
   {
@@ -635,8 +635,8 @@
     "p_ab": 0.9999909180659581,
     "p_ba": 1.281808775345877e-07,
     "c2": 1.0,
-    "first_ms": 215.7,
-    "fallback_ms": 232.3,
+    "first_ms": 215.8,
+    "fallback_ms": 232.7,
     "question": "How many faces does a regular octahedron have?"
   },
   {
@@ -645,28 +645,28 @@
     "p_ab": 0.999999999326056,
     "p_ba": 2.4975376941888053e-09,
     "c2": 1.0,
-    "first_ms": 214.2,
-    "fallback_ms": 237.2,
+    "first_ms": 213.8,
+    "fallback_ms": 236.7,
     "question": "At 3:15 on a clock, what is the angle between the hour and minute hands?"
   },
   {
     "id": "select-065",
     "truth": "b",
-    "p_ab": 2.989853846894538e-11,
-    "p_ba": 0.9999999999954168,
+    "p_ab": 2.951337181648159e-11,
+    "p_ba": 0.999999999995461,
     "c2": 1.0,
-    "first_ms": 229.3,
-    "fallback_ms": 235.6,
+    "first_ms": 219.5,
+    "fallback_ms": 232.5,
     "question": "What is the chemical formula of table salt?"
   },
   {
     "id": "select-066",
     "truth": "a",
-    "p_ab": 0.9999999999995735,
-    "p_ba": 4.945097415834434e-11,
+    "p_ab": 0.999999999999573,
+    "p_ba": 5.028022861094399e-11,
     "c2": 1.0,
-    "first_ms": 188.5,
-    "fallback_ms": 234.2,
+    "first_ms": 188.0,
+    "fallback_ms": 235.7,
     "question": "Which Python keyword turns a function into a generator?"
   },
   {
@@ -675,8 +675,8 @@
     "p_ab": 0.9999999999961686,
     "p_ba": 3.177383284017449e-10,
     "c2": 1.0,
-    "first_ms": 216.4,
-    "fallback_ms": 233.2,
+    "first_ms": 220.8,
+    "fallback_ms": 235.0,
     "question": "What is the longest bone in the human body?"
   },
   {
@@ -685,8 +685,8 @@
     "p_ab": 2.4546340472730526e-06,
     "p_ba": 0.999999999026328,
     "c2": 0.0,
-    "first_ms": 212.8,
-    "fallback_ms": 234.0,
+    "first_ms": 219.4,
+    "fallback_ms": 240.4,
     "question": "A store sells 3 apples for $1. How much do 12 apples cost?"
   },
   {
@@ -695,8 +695,8 @@
     "p_ab": 0.999999995190459,
     "p_ba": 5.606385391949116e-10,
     "c2": 1.0,
-    "first_ms": 211.5,
-    "fallback_ms": 236.6,
+    "first_ms": 218.4,
+    "fallback_ms": 237.8,
     "question": "What is the probability of rolling a sum of 7 with two fair six-sided dice?"
   },
   {
@@ -705,48 +705,298 @@
     "p_ab": 1.7267162500813677e-06,
     "p_ba": 0.08267707835817574,
     "c2": 1.0,
-    "first_ms": 215.1,
-    "fallback_ms": 240.6,
+    "first_ms": 225.2,
+    "fallback_ms": 282.4,
     "question": "Who was the first emperor of Rome?"
   },
   {
     "id": "select-071",
     "truth": "a",
-    "p_ab": 0.9999999999979958,
-    "p_ba": 3.6083924839940335e-11,
+    "p_ab": 0.9999999999979896,
+    "p_ba": 3.6539435530078036e-11,
     "c2": 1.0,
-    "first_ms": 179.0,
-    "fallback_ms": 233.8,
+    "first_ms": 176.8,
+    "fallback_ms": 234.6,
     "question": "Which unit measures electrical resistance?"
   },
   {
     "id": "select-072",
     "truth": "a",
-    "p_ab": 0.9999999999858462,
-    "p_ba": 7.291169390632083e-11,
+    "p_ab": 0.9999999999858884,
+    "p_ba": 7.317430893728282e-11,
     "c2": 1.0,
-    "first_ms": 215.6,
-    "fallback_ms": 234.0,
+    "first_ms": 216.1,
+    "fallback_ms": 230.9,
     "question": "How many vertices does a cube have?"
   },
   {
     "id": "select-073",
     "truth": "a",
-    "p_ab": 0.9999999999973677,
-    "p_ba": 1.6905035556928725e-11,
+    "p_ab": 0.9999999999973928,
+    "p_ba": 1.689162745768154e-11,
     "c2": 1.0,
-    "first_ms": 138.5,
-    "fallback_ms": 232.5,
+    "first_ms": 140.1,
+    "fallback_ms": 232.4,
     "question": "In which city is the Louvre museum?"
   },
   {
     "id": "select-074",
     "truth": "a",
-    "p_ab": 0.9999999999894544,
-    "p_ba": 2.807607245654578e-09,
+    "p_ab": 0.9999999999895239,
+    "p_ba": 2.7888843118045656e-09,
     "c2": 1.0,
-    "first_ms": 220.6,
-    "fallback_ms": 237.6,
+    "first_ms": 221.7,
+    "fallback_ms": 239.7,
     "question": "If you invest $100 at 10% interest compounded annually, what is it worth after 2 years?"
+  },
+  {
+    "id": "select-152",
+    "truth": "b",
+    "p_ab": 1.3295521700207612e-10,
+    "p_ba": 0.999999999955449,
+    "c2": 1.0,
+    "first_ms": 211.8,
+    "fallback_ms": 235.1,
+    "question": "What is 13 x 14?"
+  },
+  {
+    "id": "select-153",
+    "truth": "a",
+    "p_ab": 0.9999999999948488,
+    "p_ba": 5.57811388474218e-12,
+    "c2": 1.0,
+    "first_ms": 173.2,
+    "fallback_ms": 232.9,
+    "question": "What is the capital of Kenya?"
+  },
+  {
+    "id": "select-154",
+    "truth": "a",
+    "p_ab": 0.9999999999995239,
+    "p_ba": 3.651929967541515e-11,
+    "c2": 1.0,
+    "first_ms": 218.8,
+    "fallback_ms": 234.4,
+    "question": "Which gas do plants produce during photosynthesis?"
+  },
+  {
+    "id": "select-155",
+    "truth": "b",
+    "p_ab": 1.9689725312160971e-10,
+    "p_ba": 0.9999999999971492,
+    "c2": 1.0,
+    "first_ms": 185.5,
+    "fallback_ms": 231.7,
+    "question": "In Python, what is the type of the value 3.0?"
+  },
+  {
+    "id": "select-156",
+    "truth": "a",
+    "p_ab": 2.0304305462616665e-08,
+    "p_ba": 0.014230950558218698,
+    "c2": 1.0,
+    "first_ms": 211.9,
+    "fallback_ms": 232.2,
+    "question": "How many seconds are in 2.5 minutes?"
+  },
+  {
+    "id": "select-157",
+    "truth": "b",
+    "p_ab": 7.840042701071628e-11,
+    "p_ba": 0.9999999999990612,
+    "c2": 1.0,
+    "first_ms": 215.7,
+    "fallback_ms": 232.9,
+    "question": "Which scientist formulated the three laws of motion?"
+  },
+  {
+    "id": "select-158",
+    "truth": "a",
+    "p_ab": 0.999999999997514,
+    "p_ba": 1.3209428234431546e-10,
+    "c2": 1.0,
+    "first_ms": 213.1,
+    "fallback_ms": 233.3,
+    "question": "What is the sum of 1/2 and 1/3?"
+  },
+  {
+    "id": "select-159",
+    "truth": "a",
+    "p_ab": 0.9999999999431632,
+    "p_ba": 3.793155037777114e-09,
+    "c2": 1.0,
+    "first_ms": 192.3,
+    "fallback_ms": 235.7,
+    "question": "In Python, which operator checks whether two names refer to the same object?"
+  },
+  {
+    "id": "select-160",
+    "truth": "a",
+    "p_ab": 0.9999999999989673,
+    "p_ba": 5.3755354507577634e-11,
+    "c2": 1.0,
+    "first_ms": 142.4,
+    "fallback_ms": 231.0,
+    "question": "In which ocean did the Titanic sink?"
+  },
+  {
+    "id": "select-161",
+    "truth": "a",
+    "p_ab": 0.9999999999988212,
+    "p_ba": 2.1878983696950527e-12,
+    "c2": 1.0,
+    "first_ms": 186.0,
+    "fallback_ms": 233.3,
+    "question": "A triangle has sides 3, 4 and 5. Is it a right triangle?"
+  },
+  {
+    "id": "select-162",
+    "truth": "b",
+    "p_ab": 2.7751502865620857e-10,
+    "p_ba": 0.9999999999911899,
+    "c2": 1.0,
+    "first_ms": 216.9,
+    "fallback_ms": 232.9,
+    "question": "What is the time complexity of finding the maximum value in an unsorted array?"
+  },
+  {
+    "id": "select-163",
+    "truth": "b",
+    "p_ab": 4.488394478517844e-08,
+    "p_ba": 0.9999999996309035,
+    "c2": 1.0,
+    "first_ms": 217.7,
+    "fallback_ms": 233.9,
+    "question": "Which language has the most native speakers worldwide?"
+  },
+  {
+    "id": "select-164",
+    "truth": "b",
+    "p_ab": 6.122411298377451e-12,
+    "p_ba": 0.99999999999441,
+    "c2": 1.0,
+    "first_ms": 215.4,
+    "fallback_ms": 229.4,
+    "question": "How many legs does a spider have?"
+  },
+  {
+    "id": "select-165",
+    "truth": "a",
+    "p_ab": 0.9999999999923774,
+    "p_ba": 1.495368992329507e-10,
+    "c2": 1.0,
+    "first_ms": 217.1,
+    "fallback_ms": 233.7,
+    "question": "What is the square root of 225?"
+  },
+  {
+    "id": "select-166",
+    "truth": "a",
+    "p_ab": 0.9933841067688809,
+    "p_ba": 1.5423643049804518e-05,
+    "c2": 1.0,
+    "first_ms": 184.5,
+    "fallback_ms": 232.5,
+    "question": "Which country hosted the 2016 Summer Olympics?"
+  },
+  {
+    "id": "select-167",
+    "truth": "a",
+    "p_ab": 0.9999999999092806,
+    "p_ba": 4.539221758382748e-09,
+    "c2": 1.0,
+    "first_ms": 173.3,
+    "fallback_ms": 234.5,
+    "question": "Which chemical element has the symbol Fe?"
+  },
+  {
+    "id": "select-168",
+    "truth": "b",
+    "p_ab": 0.9999999998456275,
+    "p_ba": 0.9999999999914224,
+    "c2": 0.0,
+    "first_ms": 226.3,
+    "fallback_ms": 242.9,
+    "question": "What is 100 minus 37?"
+  },
+  {
+    "id": "select-169",
+    "truth": "b",
+    "p_ab": 6.461531349259016e-10,
+    "p_ba": 0.9999999999908784,
+    "c2": 1.0,
+    "first_ms": 183.1,
+    "fallback_ms": 233.1,
+    "question": "Who discovered penicillin?"
+  },
+  {
+    "id": "select-170",
+    "truth": "a",
+    "p_ab": 0.9999999909114515,
+    "p_ba": 0.9998764650292924,
+    "c2": 1.0,
+    "first_ms": 222.3,
+    "fallback_ms": 234.5,
+    "question": "In Python, what is the output of 5 % 3?"
+  },
+  {
+    "id": "select-171",
+    "truth": "a",
+    "p_ab": 0.9966973208100333,
+    "p_ba": 1.383456138066645e-06,
+    "c2": 1.0,
+    "first_ms": 214.0,
+    "fallback_ms": 235.5,
+    "question": "What is the probability of drawing an ace from a standard 52-card deck?"
+  },
+  {
+    "id": "select-172",
+    "truth": "a",
+    "p_ab": 0.9999999999999567,
+    "p_ba": 1.5369466331471344e-12,
+    "c2": 1.0,
+    "first_ms": 215.7,
+    "fallback_ms": 240.5,
+    "question": "Which is heavier: a kilogram of feathers or a kilogram of steel?"
+  },
+  {
+    "id": "select-173",
+    "truth": "a",
+    "p_ab": 0.9999999999189317,
+    "p_ba": 1.7452924700723185e-09,
+    "c2": 1.0,
+    "first_ms": 219.2,
+    "fallback_ms": 241.2,
+    "question": "What is the next prime number after 89?"
+  },
+  {
+    "id": "select-174",
+    "truth": "a",
+    "p_ab": 0.9999999999980038,
+    "p_ba": 1.5257934892503886e-10,
+    "c2": 1.0,
+    "first_ms": 195.9,
+    "fallback_ms": 234.8,
+    "question": "Which protocol is used to load web pages securely?"
+  },
+  {
+    "id": "select-175",
+    "truth": "a",
+    "p_ab": 0.9999447669689584,
+    "p_ba": 0.9735914396416925,
+    "c2": 1.0,
+    "first_ms": 224.4,
+    "fallback_ms": 240.5,
+    "question": "A rectangle has a perimeter of 20 and a width of 4. What is its length?"
+  },
+  {
+    "id": "select-176",
+    "truth": "b",
+    "p_ab": 1.0328644018784349e-10,
+    "p_ba": 0.9999999998621707,
+    "c2": 1.0,
+    "first_ms": 212.6,
+    "fallback_ms": 235.3,
+    "question": "Roughly what is the boiling point of ethanol at sea level?"
   }
 ]
