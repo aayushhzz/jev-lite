@@ -1,36 +1,49 @@
+<p align="center">
+  <img src="assets/banner.svg" alt="Jev Lite — Local System-One Decision API & Confidence Cascade" width="100%">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.9%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.9+">
+  <img src="https://img.shields.io/badge/Runtime-Ollama-000000?style=flat-square&logo=ollama&logoColor=white" alt="Ollama">
+  <img src="https://img.shields.io/badge/Dependencies-stdlib%20only-10b981?style=flat-square" alt="Python stdlib only">
+  <img src="https://img.shields.io/badge/Held--Out%20Cascade-100%25%20(32.2%25%20escalated)-38bdf8?style=flat-square" alt="100% held-out accuracy">
+</p>
+
+<p align="center">
+  <a href="#architecture">Architecture</a> ·
+  <a href="#run-it">Run It</a> ·
+  <a href="#evaluation-protocol">Evaluation Protocol</a> ·
+  <a href="#results">Results</a> ·
+  <a href="#limits">Limits</a> ·
+  <a href="#sources">Sources</a>
+</p>
+
+---
+
 # Jev Lite
 
-A local decision API for agents that follows the architecture in the JEV-as-a-Judge paper: typed decisions with probabilities, a two-order confidence gate, and a cascade that escalates uncertain items to a stronger judge. It runs on your machine through Ollama.
+A local decision API for agents that follows the architecture in the JEV-as-a-Judge paper: typed decisions with probabilities, a two-order confidence gate, and a cascade that escalates uncertain items to a stronger judge. It runs on your machine through Ollama with **zero third-party Python dependencies** (standard library only).
 
 It is not TypeSafe AI's Jev. The paper's hosted model is proprietary, so this build uses local open-weight models in both tiers. The architecture and the evaluation protocol follow the paper. Results will not match the paper's.
 
 ## Architecture
 
-```
-          question + two candidate responses (a, b)
-                          |
-        +-----------------v------------------+
-        |  first stage: Jev Lite (4B, local) |   judge (a,b) and (b,a)
-        |  p(a) = 1/2 [p1(a,b) + 1 - p1(b,a)] |   average aligned probabilities (paper eq. 1)
-        |  q    = max(p(a), 1 - p(a))        |   confidence, temperature-scaled
-        +-----------------+------------------+
-                          |
-                q >= tau ?  ----yes---->  accept first-stage verdict
-                          |
-                          no
-                          v
-        +------------------------------------+
-        |  fallback: stronger local model    |   judges (a,b) in base order, alone
-        |  (8B, thinking)                               |   its verdict replaces the first stage's
-        +------------------------------------+
+```mermaid
+flowchart TD
+    IN["Question + Candidate Pair (a, b)"] --> S1["First Stage: Jev Lite (qwen3:4b-instruct, local)<br/>Judge (a, b) and (b, a) via single-step logprobs"]
+    S1 --> AVG["Two-Order Debiasing & Calibration<br/>p(a) = 1/2 [p1(a,b) + 1 - p1(b,a)]<br/>q = max(p(a), 1 - p(a)) (T = 6.0)"]
+    AVG --> GATE{"Confidence Gate<br/>q >= tau (0.95)?"}
+    GATE -- "Yes (accept)" --> ACC["Return First-Stage Verdict<br/>p50 latency: 215 ms"]
+    GATE -- "No (escalate)" --> FB["Fallback Judge: qwen3:8b (thinking)<br/>Judges (a, b) in base order alone"]
+    FB --> OUT["Return Fallback Verdict<br/>p50 latency: 10,789 ms"]
 ```
 
-- **Primitives** (`POST /api/system-one`): choice, score, noul, and pairwise. Each answer is a probability distribution over options you supply, from one model step.
-- **Two-order gate**: each pair is judged in both presentation orders, and the probabilities are averaged, which cancels position bias. Confidence is q, the largest probability.
-- **Cascade** (`POST /api/cascade`): accepts the first stage when q is at least tau. Otherwise the fallback decides, and it judges only escalated items.
-- **Threshold**: chosen on a selection split with the paper's lower-bound rule (one-sided 95%, margin -0.02, grid 0.5 to 0.99). Ties go to the stricter threshold. If nothing qualifies, everything escalates.
+- **Primitives** (`POST /api/system-one` in [`server.py`](server.py)): `choice`, `score`, `noul`, and `pairwise`. Each answer is a probability distribution over options you supply, from one model step.
+- **Two-order gate**: each pair is judged in both presentation orders, and the probabilities are averaged, which cancels position bias. Confidence is `q`, the largest probability.
+- **Cascade** (`POST /api/cascade`): accepts the first stage when `q` is at least `tau`. Otherwise the fallback decides, and it judges only escalated items.
+- **Threshold**: chosen on a selection split with the paper's lower-bound rule (one-sided 95%, margin `-0.02`, grid `0.5` to `0.99`). Ties go to the stricter threshold. If nothing qualifies, everything escalates.
 - **Temperature scaling**: fitted on the selection split by minimizing NLL, as in paper section 7.2. Checked on held-out pairs.
-- **Frozen policy**: `policy.json` holds the temperature and the threshold, and the server loads it at startup.
+- **Frozen policy**: [`policy.json`](policy.json) holds the temperature and the threshold, and the server loads it at startup.
 
 Jev Lite's other endpoints: `POST /api/task-complexity` and `POST /api/coding-route` (used by [codex-langgraph](https://github.com/aayushhzz/codex-langgraph)). Their response shapes did not change.
 
@@ -70,7 +83,7 @@ curl -s localhost:8876/api/system-one -H 'Content-Type: application/json' -d '{
 }'
 ```
 
-Tests (no Ollama needed):
+Tests (no Ollama needed; located in [`tests/`](tests/)):
 
 ```bash
 python3 -m unittest discover -s tests
@@ -84,12 +97,12 @@ python3 bench/cascade_eval.py     # writes policy.json and bench/results/
 
 ## Evaluation protocol
 
-The harness follows the paper's order of operations:
+The harness ([`bench/cascade_eval.py`](bench/cascade_eval.py)) follows the paper's order of operations:
 
 1. Judge the selection pairs with both tiers. Apply the temperature and threshold rules to them.
-2. Freeze the temperature and threshold in `policy.json`. Nothing is tuned after this.
+2. Freeze the temperature and threshold in [`policy.json`](policy.json). Nothing is tuned after this.
 3. Judge the held-out pairs offline, and run the frozen cascade live through the server's own method.
-4. Report accuracy, escalation rate, paired difference against the fallback with a 2,000-resample bootstrap, ECE over 10 bins, Brier, NLL, error AUROC of 1 - q, and selective accuracy at 80% and 50% coverage.
+4. Report accuracy, escalation rate, paired difference against the fallback with a 2,000-resample bootstrap, ECE over 10 bins, Brier, NLL, error AUROC of `1 - q`, and selective accuracy at 80% and 50% coverage.
 
 The labels are 150 selection pairs, 146 fresh held-out pairs, and 77 legacy pairs. They are hand-written in [`bench/pairs.py`](bench/pairs.py), [`bench/pairs_extra.py`](bench/pairs_extra.py), and [`bench/pairs_hard.py`](bench/pairs_hard.py). The hard pairs need multi-step counting, probability, Python and SQL semantics, graph theory, or obscure facts. Each correct answer was fixed when its pair was written, and the position of the correct answer is randomized. The sets are small and written by one person, so the results are a sanity check, not a benchmark.
 
@@ -97,7 +110,7 @@ The labels are 150 selection pairs, 146 fresh held-out pairs, and 77 legacy pair
 
 Hardware: Apple M2 Pro, 16 GB, Ollama 0.40.16. First stage `qwen3:4b-instruct`, two orders, read from logprobs. Fallback `qwen3:8b` with thinking enabled, one order, read as a verdict letter. Raw judgments and full metrics are in [`bench/results/`](bench/results/).
 
-Three sets: 150 selection pairs (100 easy, 50 hard; fit T and tau), 146 fresh held-out pairs (98 easy, 48 hard; scored once after freezing), and 77 legacy pairs that I had already inspected (sanity only).
+Three sets: 150 selection pairs (100 easy, 50 hard; fit `T` and `tau`), 146 fresh held-out pairs (98 easy, 48 hard; scored once after freezing), and 77 legacy pairs that I had already inspected (sanity only).
 
 **Selection (150 pairs)**
 
@@ -107,7 +120,7 @@ Three sets: 150 selection pairs (100 easy, 50 hard; fit T and tau), 146 fresh he
 | Easy (100) | 96.0% | 100% |
 | Hard (50) | 78.0% | 100% |
 
-The temperature fit picked T = 6.0, and selection NLL fell from 0.512 to 0.207. The lower-bound rule picked tau = 0.95. With no temperature (T = 1) no threshold qualified, so every item would escalate.
+The temperature fit picked `T = 6.0`, and selection NLL fell from `0.512` to `0.207`. The lower-bound rule picked `tau = 0.95`. With no temperature (`T = 1`) no threshold qualified, so every item would escalate.
 
 **Fresh held-out (146 pairs)**
 
@@ -121,14 +134,14 @@ The temperature fit picked T = 6.0, and selection NLL fell from 0.512 to 0.207. 
 | Escalated, easy / hard | 24.5% / 47.9% |
 | First stage, easy / hard | 94.9% / 87.5% |
 | Live decisions agreeing with offline simulation | 100% |
-| ECE, 10 bins (T = 1 to T = 6, calibrated subsets above) | 0.051 to 0.018 |
+| ECE, 10 bins (`T = 1` to `T = 6`, calibrated subsets above) | 0.051 to 0.018 |
 | Latency, p50: accepted path / escalated path / fallback alone | 215 ms / 10,789 ms / 7,199 ms |
 
 **Legacy set (77 pairs, previously inspected)**: cascade 100%, escalated 14.3%. The first stage gets 93.5% and the fallback 100%.
 
 **Post hoc threshold sweep (fresh held-out, not used for the policy)**
 
-These numbers score thresholds on the held-out set, so they are for reading only. Choosing tau from them would fit the test set.
+These numbers score thresholds on the held-out set, so they are for reading only. Choosing `tau` from them would fit the test set.
 
 | tau | Escalated | Cascade minus fallback |
 | --- | --- | --- |
